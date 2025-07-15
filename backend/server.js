@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const fs = require('fs')
 const path = require('path')
+const {userSchema} = require('./userSchema.js')
 
 const app = express()
 const PORT = 5000
@@ -34,37 +35,6 @@ app.use(cors(corsOptions));
 
 app.use(express.json())
 
-const userSchema = new mongoose.Schema({
-    username:{
-        type:String,
-        trim:true,
-        required:true
-    },
-    email:{
-        type:String,
-        required:true,
-        unique:true,
-    },
-    password:{
-        type:String,
-        required:true
-    },
-    applications:[{
-        passportNo:String,
-        birthdate:String,
-        personalPhoto:{
-            filename:String,
-            data:Buffer,
-            ContentType:String
-        },passportPhoto:{
-            filename:String,
-            data:Buffer,
-            ContentType:String
-        },
-        name:String
-        
-    }]
-})
 const User = mongoose.model('User',userSchema)
 
 const findUSerByEmail = async(email)=>{
@@ -188,16 +158,68 @@ app.post('/api/create-app', async(req,res)=>{
      if(!user){
         return res.status(404).json({message : "User not found"})
     }
+    const formatPhotoName = (extension)=>{
+        return `${application.name.split(' ').join('_')}_${application.passportNo.split(" ").join("_")}_${extension}.png`
+    }
 
-    application.personalPhoto = {filename:'personal.png',data: extractImageData("galaxy.png"),ContentType: "Image/png" }
-    application.passportPhoto = {filename:'passport.png',data: extractImageData("galaxy.png"),ContentType: "Image/png" }
-    user.applications.push(application)
+    const newApplication = {
+        accountID:user._id,
+        name:application.name,
+        passportNo:application.passportNo,
+        birthdate:application.birthdate,
+        personalPhoto:{
+            filename: formatPhotoName("personal"),
+            data:application.personalPhoto,
+            ContentType:"Image/png"
+        },
+        passportPhoto:{
+            filename: formatPhotoName("passport"),
+            data:application.passportPhoto,
+            ContentType:"Image/png"
+        },
+        signature:{
+            filename: formatPhotoName("sign"),
+            data:application.signature,
+            ContentType:"Image/png"
+        },
+        expiryDate:application.expiryDate,
+        dateCreated:new Date().toISOString(""),
+        status:"pending",
+    }
+    user.applications.push(newApplication)
     await user.save()
     return res.status(200).json({message:`application:${application.name} was added to user with email ${email}` })
 
 })
 
-app.get('/api/all-applications', (req,res)=>{
+app.get('/api/user-applications', async(req,res)=>{
+    const user = await findUSerByEmail(req.body.email)
+    if(!user){
+        return res.status(404).json({message : "User not found"})
+    }
+    const applications = user.applications
+    return res.status(200).send(applications)
+
+})
+
+
+
+app.get('/api/all-applications', async(req,res)=>{
+    const combinedApplications = await User.aggregate([
+  // Step 1: Filter users with non-empty applications
+  { $match: { "applications.0": { $exists: true } } },
+  
+  // Step 2: Unwind applications array
+  { $unwind: "$applications" },
+  
+  // Step 3: Replace root with the application object
+  { $replaceRoot: { newRoot: "$applications" } }
+]);
+if(!combinedApplications){
+    return res.status(404).json({message:"No applications found"})
+}
+console.log(combinedApplications);
+return res.status(200).send(combinedApplications)
 
 })
 
