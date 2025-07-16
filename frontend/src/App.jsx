@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import './App.css'
 import { Register } from './auth/Register'
 import {Login} from './auth/Login'
@@ -6,20 +7,31 @@ import { Home } from './auth/Home'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { FloatingIcons } from './components/FloatingIcons'
 import { Organizer } from './application/Orgnizer'
-
-function App() {
+import {createContext, useEffect, useRef, useState} from 'react'
+export const organizerContext = createContext()
+export default function App() {
+  const [isOrganizerRunning, setIsOrganizerRunning] = useState(false)
+  // useEffect(()=>{
+  //   localStorage.setItem('organizer',isOrganizerRunning)
+  //   console.log("organizer stored ", {isOrganizerRunning});
+    
+  // },[isOrganizerRunning])
+  
 
   return (
     <Router>
       <FloatingIcons />
-      <Organizer></Organizer>
+      <organizerContext.Provider value={{isOrganizerRunning,setIsOrganizerRunning}}>
+      {isOrganizerRunning && <Organizer></Organizer>}
       <Routes>
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
       </Routes>
+
+       </organizerContext.Provider>
     </Router>
   )
 }
 
-export default App
+

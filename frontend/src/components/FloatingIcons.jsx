@@ -8,13 +8,14 @@ import logoutIcon from '../assets/logout.svg';
 import { useAuth } from '../auth/AuthContext';
 
 export function FloatingIcons() {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const { logout } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
     document.body.classList.toggle('light', theme === 'light');
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

@@ -1,23 +1,17 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Organizer } from "../application/Orgnizer"
+import {organizerContext} from '../App'
 
 export function Home(){
 
-    const [inApplication, setInApplication]= useState(false)
-
-    useEffect(()=>{
-        console.log({inApplication})
-    },[inApplication])
+    const {isOrganizerRunning, setIsOrganizerRunning} = useContext(organizerContext)
+    
 
     return(
         <div>
             <h1>Passport Renewal Service</h1>
-
-            {inApplication && <Organizer inApplication={inApplication}/> }
-
-
             <div className="container center">
-                <button className="call-to-action" onClick={()=>setInApplication(true)}>Create Application</button>
+                <button className="call-to-action" onClick={()=>setIsOrganizerRunning(true)}>Create Application</button>
                 
             </div>
         </div>
