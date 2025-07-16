@@ -26,7 +26,7 @@ const authReducer = (state,action)=>{
                 isAuthenticated:false,
                 user:null,
                 token:null,
-                loading:true
+                loading:false
             }
         case 'AUTH_ERROR':
             return{
@@ -34,7 +34,7 @@ const authReducer = (state,action)=>{
                 isAuthenticated:false,
                 user:null,
                 token:null,
-                loading:true
+                loading:false
             }
         case 'SET_LOADING':
             return{

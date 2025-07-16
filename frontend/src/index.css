@@ -1,0 +1,119 @@
+:root{
+    --bg-dark: oklch(0.1 0.025 237);
+    --bg: oklch(0.15 0.025 237);
+    --bg-light: oklch(0.2 0.025 237);
+    --text: oklch(0.96 0.05 237);
+    --text-muted: oklch(0.76 0.05 237);
+    --highlight: oklch(0.5 0.05 237);
+    --border: oklch(0.4 0.05 237);
+    --border-muted: oklch(0.3 0.05 237);
+    --primary: oklch(0.76 0.1 237);
+    --secondary: oklch(0.76 0.1 57);
+    --danger: oklch(0.7 0.05 30);
+    --warning: oklch(0.7 0.05 100);
+    --success: oklch(0.7 0.05 160);
+    --info: oklch(0.7 0.05 260);
+    margin:0;
+    padding:0;
+}
+
+body.light{
+    --bg-dark: oklch(0.92 0.025 237);
+--bg: oklch(0.96 0.025 237);
+--bg-light: oklch(1 0.025 237);
+--text: oklch(0.15 0.05 237);
+--text-muted: oklch(0.4 0.05 237);
+--highlight: oklch(1 0.05 237);
+--border: oklch(0.6 0.05 237);
+--border-muted: oklch(0.7 0.05 237);
+--primary: oklch(0.4 0.1 237);
+--secondary: oklch(0.4 0.1 57);
+--danger: oklch(0.5 0.05 30);
+--warning: oklch(0.5 0.05 100);
+--success: oklch(0.5 0.05 160);
+--info: oklch(0.5 0.05 260);
+}
+
+body{
+    background-color: var(--bg-dark);
+    min-height: 100dvh;
+    padding: 0;
+    margin: 0;
+}
+.fullscreen{
+    min-height: 100dvh;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.self-center-main{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.text, p,label{
+    color:var(--text-muted)
+}
+.heading, h1,h2,h3,h4{
+    color: var(--text);
+}
+.container{
+    background-color: var(--bg);
+    padding: 20px;
+    border: 1px var(--border) solid;
+    border-radius: 20px;
+    
+}
+.button{
+    background-color: var(--bg-light);
+    color: var(--bg-light);
+    font-size: inherit;
+    border: 1px var(--border-muted) solid;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+
+}
+.button:hover{
+    background-color: var(--bg);
+}
+.call-to-action{
+    background-color: var(--primary);
+    color: var(--bg-light);
+    font-size: inherit;
+    border: 1px var(--border-muted) solid;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.call-to-action:hover{
+    background-color: var(--border);
+}
+input{
+    background-color: var(--highlight);
+    border: 1px var(--border) solid;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 10px;
+    margin: 5px;
+    font-size: 20px;
+
+}
+.no-flex{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+a{
+    color: var(--secondary);
+}
