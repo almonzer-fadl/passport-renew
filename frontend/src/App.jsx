@@ -24,6 +24,7 @@ export default function App() {
       <organizerContext.Provider value={{isOrganizerRunning,setIsOrganizerRunning}}>
       {isOrganizerRunning && <Organizer></Organizer>}
       <Routes>
+        <Route path="/" element={<ProtectedRoute><Home/></ProtectedRoute>}></Route>
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
