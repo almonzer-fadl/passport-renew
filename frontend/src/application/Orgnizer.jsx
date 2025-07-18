@@ -28,7 +28,7 @@ export function Organizer(){
     return(
        <>
        <div className="shade-back"></div>
-       <div className="container absolute">
+       <div className="container absolute padding">
         <button className='cancel-btn button' onClick={()=>setIsOrganizerRunning(false)}>
             <img src={cancelImg} alt="cancel Icon" />
         </button>

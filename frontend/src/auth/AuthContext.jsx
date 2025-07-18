@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { createContext, useContext, useReducer, useEffect } from "react"
+import { createContext, useReducer, useEffect ,useContext} from "react"
 
-const AuthContext = createContext()
+export const AuthContext = createContext()
 
 const initialState = {
     isAuthenticated: false,
@@ -172,6 +172,7 @@ export const AuthProvider = ({children})=>{
   );
 }
 
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -179,7 +180,5 @@ export const useAuth = () => {
   }
   return context;
 };
-
-export default AuthContext;
     
    
