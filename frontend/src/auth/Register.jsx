@@ -58,12 +58,14 @@ export function Register(){
         <>
         {error? alert(error):null}
 
-        <div className="container center self-center-main">
-            <h1>Register</h1>
+        <div className="min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-200 rounded-2xl p-10 flex-col justify-center align-middle  border-dashed border-2 border-blue-300">
+            <h1 className="text-5xl mb-5 font-bold">Register</h1>
             <form onSubmit={handleSubmit}>
                 <div className="no-flex">
                     <label htmlFor="username">Username</label>
+                    
                     <input type="text"
+                     className="border-1 rounded-md p-2 text-lg mb-3 w-full"
                      placeholder="Username"
                      maxLength={20}
                      minLength={4}
@@ -73,6 +75,7 @@ export function Register(){
                 </div> <div className="no-flex">
                     <label htmlFor="emali">Email</label>
                     <input type="email"
+                     className="border-1 rounded-md p-2 text-lg mb-3 w-full"
                      placeholder="Email"
                      maxLength={20}
                      minLength={4}
@@ -83,6 +86,7 @@ export function Register(){
                 <div className="no-flex">
                     <label htmlFor="password">Password</label>
                     <input type="password"
+                     className="border-1 rounded-md p-2 text-lg mb-3 w-full"
                      placeholder="Password"
                      maxLength={20}
                      minLength={6}
@@ -93,6 +97,7 @@ export function Register(){
                  <div className="no-flex">
                     <label htmlFor="confirmPassword">Confirm Password</label>
                     <input type="password"
+                     className="border-1 rounded-md p-2 text-lg mb-3 w-full"
                      placeholder="Confirm Password"
                      maxLength={20}
                      minLength={6}
@@ -102,10 +107,10 @@ export function Register(){
                 </div>
                 <div className="no-flex">
 
-                <button className="call-to-action" type="submit">Register</button>
+                <button className="p-2 pl-20 pr-20 bg-blue-600 text-white text-2xl rounded-4xl m-5"type="submit">Register</button>
                 </div>
             </form>
-            <p>Already have an account? <Link to="/login">Login</Link></p>
+            <p>Already have an account? <Link className="text-blue-700" to="/login">Login</Link></p>
         </div>
         </>
     )

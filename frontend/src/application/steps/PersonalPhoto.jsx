@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as faceapi from 'face-api.js'
+import { Button } from '../../components/Button';
 
 export default function PersonalPhoto() {
   const videoRef = useRef(null);
@@ -13,13 +14,13 @@ export default function PersonalPhoto() {
   const [hasWhiteBackground, setHasWhiteBackground] = useState(false);
   const [cameraDimensions, setCameraDimensions] = useState({ width: 0, height: 0 });
 
+
+
   useEffect(() => {
     const loadModels = async () => {
         await Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
-            faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-            faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-            faceapi.nets.faceExpressionNet.loadFromUri("/models")
+            faceapi.nets.faceRecognitionNet.loadFromUri("/models")
         ]);
     };
     loadModels();
@@ -83,7 +84,7 @@ export default function PersonalPhoto() {
             });
 
             const detections = await faceapi.detectAllFaces(videoRef.current,
-                new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
+                new faceapi.TinyFaceDetectorOptions());
             
             const resizedDetections = faceapi.resizeResults(detections, {
                 width: cameraDimensions.width,
@@ -233,61 +234,61 @@ export default function PersonalPhoto() {
   return (
     <div >
       
-      <div >
+      <div className={!photo?'p-30 min-h-100 ':""}>
         {!stream && !photo ? (
-          <button 
+          <Button 
             onClick={startCamera}
-            className="button"
+            text="StartCamera"
+
           >
-            Start Camera
-          </button>
+            
+          </Button>
         ) : null}
 
       </div>
 
-      <div className={stream ? "absolute video-container" : ''}>
+      <div className={stream ? "bg-black absolute top-0 left-0  w-full h-dvh flex align-middle justify-center" : 'none'}>
 
          {stream && (
-          <div className='button-container'>
-            <button 
+          <div className='absolute bottom-10 flex '>
+            <Button 
               onClick={stopCamera}
-              className="button"
+              text="Cancel"
             >
-              Cancel
-            </button>
-            <button 
-              disabled={!isFace || !hasWhiteBackground}
+            </Button>
+            <Button 
               onClick={takePhoto}
-              className={`button ${(isFace && hasWhiteBackground) ? "" : "disabled"}`}
+              isDisabled={!isFace}
+              text="Take Photo"
             >
-              Take Photo
-            </button>
+            </Button>
           </div>
         )}
 
         {photo && (
-          <div className='button-container'>
-            <button 
+          <div className=' flex'>
+            <Button 
                 onClick={() => {
                     setPhoto(null)
                     setPhotoBlob(null)
                 }}
                 className="button"
+                text="Cancel"
             >
-                Cancel
-            </button>
-            <button 
+            </Button>
+            <Button 
                 onClick={retakePhoto}
                 className="button"
+                text="Retake"
             >
-                Retake
-            </button>
-            <button 
+                
+            </Button>
+            <Button 
                 onClick={savePhoto}
                 className="button"
+                text="Save"
             >
-                Save Photo
-            </button>
+            </Button>
           </div>
         )}
       
@@ -297,7 +298,7 @@ export default function PersonalPhoto() {
             autoPlay 
             muted
             onPlay={handleVideoPlay}
-            className={`video ${stream && !photo ? '' : 'hidden'}`}
+            className={`${stream && !photo ? '' : 'hidden'}`}
             style={{
               width: `${cameraDimensions.width}px`,
               height: `${cameraDimensions.height}px`,
@@ -309,7 +310,7 @@ export default function PersonalPhoto() {
 
         <canvas 
           ref={canvasRef} 
-          className={photo ? '' : 'hidden'}
+          className={photo ? 'm-auto' : 'hidden'}
           style={{
             width: `${cameraDimensions.width}px`,
             height: `${cameraDimensions.height}px`

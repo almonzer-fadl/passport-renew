@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import './FloatingIcons.css';
 import dayIcon from '../assets/day.svg';
 import nightIcon from '../assets/night.svg';
 import worldIcon from '../assets/world.svg';

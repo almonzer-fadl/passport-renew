@@ -12,11 +12,12 @@ export function BasicInformation(){
     const today = new Date().toISOString().split('T')[0]
 
     return (
-        <>
-       <div className="no-flex">
+        <div className="flex-col p-5">
+       <div >
         <label htmlFor="fullname">Full Name</label>
         <input type="text"
         name="fullname"
+        className="border-1 rounded-md p-2 text-lg mb-3 w-full"
             placeholder="Full Name"
             minLength={5}
             value={fullname}
@@ -25,9 +26,10 @@ export function BasicInformation(){
 
        </div>
        
-       <div className="no-flex">
+       <div >
         <label htmlFor="passport-number">Passport No.</label>
         <input type="text"
+        className="border-1 rounded-md p-2 text-lg mb-3 w-full"
         name="passport-number"
             placeholder="AA123456"
             minLength={5}
@@ -36,9 +38,10 @@ export function BasicInformation(){
         />
        </div>
 
-        <div className="no-flex">
+        <div >
         <label htmlFor="national-number">National No.</label>
         <input type="text"
+        className="border-1 rounded-md p-2 text-lg mb-3 w-full"
         name="national-number"
             value={nationalNo}
             placeholder="123-1234-1234"
@@ -47,9 +50,10 @@ export function BasicInformation(){
         />
        </div>
 
-       <div className="no-flex">
+       <div >
         <label htmlFor="birth-place">Birth place</label>
         <input type="text"
+        className="border-1 rounded-md p-2 text-lg mb-3 w-full"
         name="birth-place"
             value={birthPlace}
             placeholder="place of birth"
@@ -59,9 +63,10 @@ export function BasicInformation(){
        </div>
 
 
-       <div className="no-flex">
+       <div >
         <label htmlFor="birthday">Birthday</label>
         <input type="date"
+        className="border-1 rounded-md p-2 text-lg mb-3 w-full"
         name="birthday"
             value={birthday}
             onChange={(e)=>{setBirthday(e.target.value)}}
@@ -70,9 +75,10 @@ export function BasicInformation(){
         />
        </div>  
        
-       <div className="no-flex">
+       <div >
         <label htmlFor="expiry">Passport expiry date</label>
         <input type="text"
+        className="border-1 rounded-md p-2 text-lg mb-3 w-full"
         name="expiry"
             value={expiry}
             placeholder="mm/yy"
@@ -84,6 +90,6 @@ export function BasicInformation(){
       
        
         
-       </>
+       </div>
     )
 }
