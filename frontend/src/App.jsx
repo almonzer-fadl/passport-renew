@@ -1,5 +1,4 @@
 /* eslint-disable react-refresh/only-export-components */
-import './App.css'
 import { Register } from './auth/Register'
 import {Login} from './auth/Login'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
@@ -20,7 +19,7 @@ export default function App() {
 
   return (
     <Router>
-      <FloatingIcons />
+      {/* <FloatingIcons /> */}
       <organizerContext.Provider value={{isOrganizerRunning,setIsOrganizerRunning}}>
       {isOrganizerRunning && <Organizer></Organizer>}
       <Routes>
@@ -28,6 +27,7 @@ export default function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
+        <Route path='/application' element={<ProtectedRoute><Organizer></Organizer></ProtectedRoute>}></Route>
       </Routes>
 
        </organizerContext.Provider>

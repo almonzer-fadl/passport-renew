@@ -1,16 +1,17 @@
 import {useState, useEffect, useContext} from 'react'
-import './Organizer.css' 
 import cancelImg from '../assets/cancel.svg'
 import {organizerContext} from '../App'
 import {BasicInformation} from './steps/BasicInformation'
 import PersonalPhoto from './PersonalPhoto'
+import { Popup } from '../popup'
 
 export function Organizer(){
 
-    const {isOrganizerRunning, setIsOrganizerRunning} = useContext(organizerContext)
     const [step, setStep] = useState(0)
     const stepList = ["Basic Information","Personal Photo","Passport Photo","signature","Location"]
     const pages = [<BasicInformation/>, <PersonalPhoto/>]
+    const [showPopup,setShowPopup] = useState(false)
+
     const handlePrev = ()=>{
         if(step<=0){
             return
@@ -27,9 +28,20 @@ export function Organizer(){
 
     return(
        <>
-       <div className="shade-back"></div>
-       <div className="container absolute padding">
-        <button className='cancel-btn button' onClick={()=>setIsOrganizerRunning(false)}>
+
+        {showPopup && <Popup 
+        closeFunc={()=>{Navigate('/home')
+            setShowPopup(false) }
+        }
+        returnFunc={()=>{
+            setShowPopup(false)            
+        }}
+            ></Popup>}
+       <div className="">
+        <button className='cancel-btn button' onClick={()=>{
+            setShowPopup(true)
+            console.log("cancel button clicked", showPopup)
+        }}>
             <img src={cancelImg} alt="cancel Icon" />
         </button>
 

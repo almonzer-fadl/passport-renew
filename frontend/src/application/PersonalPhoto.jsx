@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import './Organizer.css'
 import * as faceapi from 'face-api.js'
 
 export default function PersonalPhoto() {
@@ -202,6 +201,7 @@ export default function PersonalPhoto() {
     
     // Get image data as PNG
     const imageDataURL = canvas.toDataURL('image/png');
+    console.log(imageDataURL)
     setPhoto(imageDataURL);
     
     // Convert to blob for saving
@@ -266,7 +266,7 @@ export default function PersonalPhoto() {
         )}
 
         {photo && (
-          <div>
+          <div className='button-container'>
             <button 
                 onClick={() => {
                     setPhoto(null)
@@ -304,13 +304,7 @@ export default function PersonalPhoto() {
               objectFit: 'cover'
             }}
           />
-          <canvas ref={faceCanvasRef}
-              className='face-canvas'
-              style={{
-                width: `${cameraDimensions.width}px`,
-                height: `${cameraDimensions.height}px`
-              }}
-          />
+      
         </div>
 
         <canvas 
