@@ -18,7 +18,7 @@ export function Home(){
             <button className="w-10 h-10 flex justify-center align-middle cursor-pointer" onClick={logout}><img  src={logoutIcon} alt="logout icon"></img></button>
             </header>
             <div className=" text-gray-950 flex justify-center align-middle h-full m-10 p-10 border-2 border-gray-400 border-dashed dash rounded-2xl">
-                <button className="p-3 text-gray-200 bg-blue-600 cursor-pointer text-2xl rounded-xl hover:bg-blue-900 transition-colors" onClick={()=>{navigate('/application')}}>Start New Application</button>
+                <button className="btn btn-primary" onClick={()=>{navigate('/application')}}>Start New Application</button>
                 
             </div>
         </div>

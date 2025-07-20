@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as faceapi from 'face-api.js'
-import { Button } from '../../components/Button';
 
 export default function PersonalPhoto() {
   const videoRef = useRef(null);
@@ -232,76 +231,79 @@ export default function PersonalPhoto() {
   };
 
   return (
-    <div >
+    <div className=''>
       
-      <div className={!photo?'p-30 min-h-100 ':""}>
+      <div className={!photo?' min-h-50 flex justify-center align-middle border-2 m-4 border-dashed rounded-2xl':""}>
         {!stream && !photo ? (
-          <Button 
+          <button
+          className="btn-primary btn m-auto" 
             onClick={startCamera}
             text="StartCamera"
 
           >
-            
-          </Button>
+            Start Camera
+          </button>
         ) : null}
 
       </div>
 
-      <div className={stream ? "bg-black absolute top-0 left-0  w-full h-dvh flex align-middle justify-center" : 'none'}>
+      <div className={stream ? "bg-white absolute top-0 left-0  w-full h-dvh flex align-middle justify-center z-10" : 'none'}>
 
          {stream && (
-          <div className='absolute bottom-10 flex '>
-            <Button 
+          <div className='absolute bottom-10 gap-10 flex justify-center'>
+            <button 
+            className='btn'
               onClick={stopCamera}
-              text="Cancel"
             >
-            </Button>
-            <Button 
+              Cancel
+            </button>
+            <button 
+            className='btn btn-primary'
               onClick={takePhoto}
-              isDisabled={!isFace}
-              text="Take Photo"
+              // disabled={!isFace}
             >
-            </Button>
+              Take Photo
+            </button>
           </div>
         )}
 
         {photo && (
-          <div className=' flex'>
-            <Button 
+          <div className='flex space-x-10 justify-center p-10'>
+            <button 
                 onClick={() => {
                     setPhoto(null)
                     setPhotoBlob(null)
                 }}
-                className="button"
-                text="Cancel"
+                className="btn"
             >
-            </Button>
-            <Button 
+              Remove
+            </button>
+            <button 
                 onClick={retakePhoto}
-                className="button"
+                className="btn"
                 text="Retake"
             >
-                
-            </Button>
-            <Button 
+                Retake
+            </button>
+            <button 
                 onClick={savePhoto}
-                className="button"
-                text="Save"
+                className="btn"
             >
-            </Button>
+              Save
+            </button>
           </div>
         )}
       
-        <div className='canvas-container'>
+        <div className='w-full h-full'>
           <video 
             ref={videoRef} 
             autoPlay 
             muted
             onPlay={handleVideoPlay}
-            className={`${stream && !photo ? '' : 'hidden'}`}
+            className={`${stream && !photo ? 'm-auto' : 'hidden'}`}
             style={{
-              width: `${cameraDimensions.width}px`,
-              height: `${cameraDimensions.height}px`,
+              width:cameraDimensions.width,
+              height:cameraDimensions.height,
               objectFit: 'cover'
             }}
           />
@@ -310,10 +312,10 @@ export default function PersonalPhoto() {
 
         <canvas 
           ref={canvasRef} 
-          className={photo ? 'm-auto' : 'hidden'}
+          className={photo ? 'mx-auto my-10 p-4 border-4 border-gray-400 border-dashed' : 'hidden'}
           style={{
-            width: `${cameraDimensions.width}px`,
-            height: `${cameraDimensions.height}px`
+            width: `${cameraDimensions.width/2}px`,
+            height: `${cameraDimensions.height/2}px`
           }}
         />
       </div>
