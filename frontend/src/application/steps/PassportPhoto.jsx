@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-export function PassportPhoto() {
-    const [photo, setPhoto] = useState(null)
+export function PassportPhoto(props) {
+    const [photo, setPhoto] = props.photo
     const [photoBlob, setPhotoBlob] = useState(null)
     const [stream, setStream] = useState(null)
     const videoRef = useRef(null)
@@ -119,7 +119,6 @@ export function PassportPhoto() {
         
         // Get image data as PNG
         const imageDataURL = canvas.toDataURL('image/png');
-        console.log(imageDataURL)
         setPhoto(imageDataURL);
         
         // Convert to blob for saving
@@ -157,7 +156,7 @@ export function PassportPhoto() {
             {!stream && !photo && (
                 <div className="min-h-50 flex justify-center align-middle rounded-2xl border-2 m-4 border-dashed">
                     <button
-                        className="btn-primary btn m-auto" 
+                        className=" btn btn-primary m-auto" 
                         onClick={startCamera}
                     >
                         Start Camera

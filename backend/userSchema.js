@@ -16,28 +16,16 @@ const userSchema = new mongoose.Schema({
     },
     applications:[{
         accountID:String,
-        name:String,
+        fullname:String,
         passportNo:String,
-        birthdate:String,
-        personalPhoto:{
-            filename:String,
-            data:String,
-            ContentType:String
-        },
-        passportPhoto:{
-            filename:String,
-            data:String,
-            ContentType:String
-        },
-        signature:{
-            filename:String,
-            data:String,
-            ContentType:String
-        },
-        expiryData:String,
+        birthday:String,
+        personalPhoto:String,
+        passportPhoto:String,
+        signature:String,
+        expiry:String,
+        location:String,
         dateCreated:Date,
         status:String,
-        
         
     }]
 })

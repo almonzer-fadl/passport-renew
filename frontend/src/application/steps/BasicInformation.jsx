@@ -1,13 +1,13 @@
 import { useState } from "react"
 
-export function BasicInformation(){
+export function BasicInformation(props){
 
-    const [fullname, setFullname] = useState('')
-    const [passportNo, setPassportNo] = useState('')
-    const [birthday, setBirthday] = useState('')
-    const [expiry, setExpiry] = useState('')
-    const [nationalNo, setNationalNo]= useState('')
-    const [birthPlace, setBirthPlace] = useState('')
+    const {fullname, setFullname} = props.payload
+    const {passportNo, setPassportNo} = props.payload
+    const {birthday, setBirthday} = props.payload
+    const {expiry, setExpiry} = props.payload
+    const {nationalNo, setNationalNo}= props.payload
+    const {birthPlace, setBirthPlace} = props.payload
 
     const today = new Date().toISOString().split('T')[0]
 
@@ -57,7 +57,7 @@ export function BasicInformation(){
         name="birth-place"
             value={birthPlace}
             placeholder="place of birth"
-            maxLength={5}
+            maxLength={20}
             onChange={(e)=>{setBirthPlace(e.target.value)}}
         />
        </div>

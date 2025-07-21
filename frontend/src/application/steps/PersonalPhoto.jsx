@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as faceapi from 'face-api.js'
 
-export default function PersonalPhoto() {
+export default function PersonalPhoto(props) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const faceCanvasRef = useRef(null)
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = props.photo
+  
   const [photoBlob, setPhotoBlob] = useState(null); // Store as blob for saving
   const [stream, setStream] = useState(null);
   const intervalRef = useRef(null);
@@ -13,7 +14,7 @@ export default function PersonalPhoto() {
   const [hasWhiteBackground, setHasWhiteBackground] = useState(false);
   const [cameraDimensions, setCameraDimensions] = useState({ width: 0, height: 0 });
 
-
+  
 
   useEffect(() => {
     const loadModels = async () => {
@@ -71,72 +72,117 @@ export default function PersonalPhoto() {
   }, [stream]);
 
   const handleVideoPlay = () => {
-    if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-    }
-
-    intervalRef.current = setInterval(async () => {
-        if (videoRef.current && faceCanvasRef.current && !videoRef.current.paused && !videoRef.current.ended && cameraDimensions.width > 0) {
-            faceapi.matchDimensions(faceCanvasRef.current, {
-                width: cameraDimensions.width,
-                height: cameraDimensions.height
-            });
-
-            const detections = await faceapi.detectAllFaces(videoRef.current,
-                new faceapi.TinyFaceDetectorOptions());
-            
-            const resizedDetections = faceapi.resizeResults(detections, {
-                width: cameraDimensions.width,
-                height: cameraDimensions.height
-            });
-
-            
-            // const context = faceCanvasRef.current.getContext('2d');
-            // context.clearRect(0, 0, faceCanvasRef.current.width, faceCanvasRef.current.height);
-            // faceapi.draw.drawDetections(faceCanvasRef.current, resizedDetections);
-
-            if (detections && detections.length > 0) {
-                const face = detections[0];
-                const box = face.detection.box;
-
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.width = cameraDimensions.width;
-                tempCanvas.height = cameraDimensions.height;
-                
-                // Draw the video frame cropped to the aspect ratio
-                drawVideoToCanvas(tempCtx, videoRef.current, cameraDimensions.width, cameraDimensions.height);
-
-                const samplePoints = [
-                    { x: 0, y: 0 },
-                    { x: tempCanvas.width - 1, y: 0 },
-                    { x: 0, y: tempCanvas.height - 1 },
-                    { x: tempCanvas.width - 1, y: tempCanvas.height - 1 }
-                ];
-
-                let whitePixelCount = 0;
-                const whiteThreshold = 0;
-
-                samplePoints.forEach(point => {
-                    if (point.x < box.x || point.x > box.x + box.width || point.y < box.y || point.y > box.y + box.height) {
-                        const pixelData = tempCtx.getImageData(point.x, point.y, 1, 1).data;
-                        if (pixelData[0] > whiteThreshold && pixelData[1] > whiteThreshold && pixelData[2] > whiteThreshold) {
-                            whitePixelCount++;
-                        }
-                    }
-                });
-
-                setHasWhiteBackground(whitePixelCount >= 3);
-
-                const faceScore = face.detection.score;
-                setIsFace(faceScore >= 0.6);
-            } else {
-                setIsFace(false);
-                setHasWhiteBackground(false);
-            }
-        }
-    }, 100);
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current);
   }
+
+  intervalRef.current = setInterval(async () => {
+    // Check if video is ready and has valid dimensions
+    if (
+      videoRef.current && 
+      faceCanvasRef.current && 
+      !videoRef.current.paused 
+    ) {
+      
+      
+      try {
+        // Set up the canvas for face detection visualization
+        faceCanvasRef.current.width = cameraDimensions.width;
+        faceCanvasRef.current.height = cameraDimensions.height;
+        
+        faceapi.matchDimensions(faceCanvasRef.current, {
+          width: cameraDimensions.width,
+          height: cameraDimensions.height
+        });
+
+        // Detect faces with more lenient options
+        const detections = await faceapi.detectAllFaces(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 416, // Higher resolution for better detection
+            scoreThreshold: 0.3 // Lower threshold to catch more faces
+          })
+        );
+        
+        
+        // Resize detections to match canvas dimensions
+        const resizedDetections = faceapi.resizeResults(detections, {
+          width: cameraDimensions.width,
+          height: cameraDimensions.height
+        });
+
+        // Clear and redraw face detection boxes
+        const context = faceCanvasRef.current.getContext('2d');
+        context.clearRect(0, 0, faceCanvasRef.current.width, faceCanvasRef.current.height);
+        
+        if (resizedDetections.length > 0) {
+          faceapi.draw.drawDetections(faceCanvasRef.current, resizedDetections);
+        }
+
+        // Process face detection results
+        if (detections && detections.length > 0) {
+          
+          const face = detections[0];
+          const faceScore = face.score;
+          const box = face.box;
+          
+
+          // Create temporary canvas for background analysis
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          tempCanvas.width = cameraDimensions.width;
+          tempCanvas.height = cameraDimensions.height;
+          
+          // Draw the current video frame
+          drawVideoToCanvas(tempCtx, videoRef.current, cameraDimensions.width, cameraDimensions.height);
+
+          // Sample corner points for white background detection
+          const samplePoints = [
+            { x: 0, y: 0 },
+            { x: tempCanvas.width - 1, y: 0 },
+            { x: 0, y: tempCanvas.height - 1 },
+            { x: tempCanvas.width - 1, y: tempCanvas.height - 1 }
+          ];
+
+          let whitePixelCount = 0;
+          const whiteThreshold = 100; // More reasonable threshold for white detection
+
+          samplePoints.forEach(point => {
+            // Only sample points outside the face bounding box
+            if (point.x < box.x || point.x > box.x + box.width || 
+                point.y < box.y || point.y > box.y + box.height) {
+              const pixelData = tempCtx.getImageData(point.x, point.y, 1, 1).data;
+              const isWhite = pixelData[0] > whiteThreshold && 
+                            pixelData[1] > whiteThreshold && 
+                            pixelData[2] > whiteThreshold;
+              if (isWhite) {
+                whitePixelCount++;
+              }
+            }
+          });
+
+          // Update state based on detection results
+          const hasGoodFace = faceScore >= 0.5; // Slightly lower threshold for better UX
+          const hasWhiteBg = whitePixelCount >= 3;
+          
+          setIsFace(hasGoodFace);
+          setHasWhiteBackground(hasWhiteBg);
+          
+          
+        } else {
+          // No faces detected
+          console.log('No faces detected');
+          setIsFace(false);
+          setHasWhiteBackground(false);
+        }
+        
+      } catch (error) {
+        console.error('Face detection error:', error);
+        // Don't update state on error to avoid flickering
+      }
+    }
+  }, 200); // Slightly longer interval to reduce CPU usage
+};
 
   // Helper function to draw video to canvas with proper cropping for aspect ratio
   const drawVideoToCanvas = (ctx, video, targetWidth, targetHeight) => {
@@ -201,7 +247,6 @@ export default function PersonalPhoto() {
     
     // Get image data as PNG
     const imageDataURL = canvas.toDataURL('image/png');
-    console.log(imageDataURL)
     setPhoto(imageDataURL);
     
     // Convert to blob for saving
@@ -217,18 +262,7 @@ export default function PersonalPhoto() {
   }
 
   // Function to save the image
-  const savePhoto = () => {
-    if (photoBlob) {
-      const url = URL.createObjectURL(photoBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `photo_${Date.now()}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  };
+  
 
   return (
     <div className=''>
@@ -250,7 +284,7 @@ export default function PersonalPhoto() {
       <div className={stream ? "bg-white absolute top-0 left-0  w-full h-dvh flex align-middle justify-center z-10" : 'none'}>
 
          {stream && (
-          <div className='absolute bottom-10 gap-10 flex justify-center'>
+          <div className='absolute bottom-1/12 gap-10 flex justify-center'>
             <button 
             className='btn'
               onClick={stopCamera}
@@ -260,7 +294,7 @@ export default function PersonalPhoto() {
             <button 
             className='btn btn-primary'
               onClick={takePhoto}
-              // disabled={!isFace}
+               disabled={!isFace || !hasWhiteBackground}
             >
               Take Photo
             </button>
@@ -268,7 +302,7 @@ export default function PersonalPhoto() {
         )}
 
         {photo && (
-          <div className='flex space-x-10 justify-center p-10'>
+          <div className='flex space-x-10 justify-center p-10 z-10'>
             <button 
                 onClick={() => {
                     setPhoto(null)
@@ -285,16 +319,11 @@ export default function PersonalPhoto() {
             >
                 Retake
             </button>
-            <button 
-                onClick={savePhoto}
-                className="btn"
-            >
-              Save
-            </button>
+            
           </div>
         )}
       
-        <div className='w-full h-full'>
+        <div className='w-full h-full flex justify-center items-center'>
           <video 
             ref={videoRef} 
             autoPlay 
@@ -307,17 +336,35 @@ export default function PersonalPhoto() {
               objectFit: 'cover'
             }}
           />
+          <canvas
+          ref={faceCanvasRef}
+          className='hidden none'
+          style={{
+              width:cameraDimensions.width,
+              height:cameraDimensions.height,
+              objectFit: 'cover'
+          }}
+          />
       
         </div>
 
         <canvas 
           ref={canvasRef} 
-          className={photo ? 'mx-auto my-10 p-4 border-4 border-gray-400 border-dashed' : 'hidden'}
+          // className={photo ? 'mx-auto my-10 p-4 border-4 border-gray-400 border-dashed' : 'hidden'}
+          className='hidden none'
           style={{
             width: `${cameraDimensions.width/2}px`,
             height: `${cameraDimensions.height/2}px`
           }}
         />
+        <img src={photo} alt="personal photo"
+        className={photo ? 'mx-auto my-10 p-4 border-4 border-gray-400 border-dashed' : 'hidden'} 
+         style={{
+            width: `${cameraDimensions.width/2}px`,
+            height: `${cameraDimensions.height/2}px`
+          }}
+          />
+
       </div>
     </div>
   );

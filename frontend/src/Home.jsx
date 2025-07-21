@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react"
-import { Organizer } from "../application/Orgnizer"
-import {organizerContext} from '../App'
+import { Organizer } from "./application/Orgnizer"
+import {organizerContext} from './App'
 import { useNavigate } from "react-router-dom"
-import logoutIcon from "../assets/logout.svg"
-import {useAuth} from "./AuthContext"
+import logoutIcon from "./assets/logout.svg"
+import {useAuth} from "./auth/AuthContext"
 
 export function Home(){
 
@@ -11,7 +11,7 @@ export function Home(){
     const {logout} = useAuth()
 
     return(
-        <div>
+        <div className="bg-blue-50 min-h-dvh">
             <header className="bg-blue-800 text-white text-4xl font-bold p-5 flex justify-between align-middle">
 
             <h1 className="text-center"> Passport Renewal Service</h1>

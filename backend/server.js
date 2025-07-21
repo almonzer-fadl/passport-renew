@@ -33,7 +33,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(express.json())
+app.use(express.json({limit: '50mb'}))
+app.use(express.urlencoded({limit: '50mb', extended: true}))
 
 const User = mongoose.model('User',userSchema)
 
@@ -151,44 +152,39 @@ app.get('/api/verify-token', authenticateToken,async(req,res)=>{
     })
 })
 
-app.post('/api/create-app', async(req,res)=>{
+app.post('/api/create-app'  ,async(req,res)=>{
+    console.log("create app query made");
+    
     const {email,application} = req.body
     const user = await findUSerByEmail(email)
-    console.log(`${user}: (${application})`)
-     if(!user){
+    if(!user){
         return res.status(404).json({message : "User not found"})
     }
-    const formatPhotoName = (extension)=>{
-        return `${application.name.split(' ').join('_')}_${application.passportNo.split(" ").join("_")}_${extension}.png`
+    if(!application.fullname){
+        return res.status(402).json({message:"data is missing"})
     }
+   
 
     const newApplication = {
         accountID:user._id,
-        name:application.name,
+        fullname:application.fullname,
         passportNo:application.passportNo,
-        birthdate:application.birthdate,
-        personalPhoto:{
-            filename: formatPhotoName("personal"),
-            data:application.personalPhoto,
-            ContentType:"Image/png"
-        },
-        passportPhoto:{
-            filename: formatPhotoName("passport"),
-            data:application.passportPhoto,
-            ContentType:"Image/png"
-        },
-        signature:{
-            filename: formatPhotoName("sign"),
-            data:application.signature,
-            ContentType:"Image/png"
-        },
-        expiryDate:application.expiryDate,
-        dateCreated:new Date().toISOString(""),
+        nationalNo:application.nationalNo,
+        birthPlace:application.birthPlace,
+        birthday:application.birthday,
+        personalPhoto:application.personalPhoto,
+        passportPhoto:application.passportPhoto,
+        signature:application.signature,
+        expiry:application.expiry,
+        location:application.location,
+        dateCreated:new Date().toISOString("").split("T")[0],
         status:"pending",
     }
     user.applications.push(newApplication)
     await user.save()
-    return res.status(200).json({message:`application:${application.name} was added to user with email ${email}` })
+    console.log(`${user._id}: (${application.fullname})`)
+
+    return res.status(200).json({message:`application:${application.fullname} was added to user with email ${email}` })
 
 })
 

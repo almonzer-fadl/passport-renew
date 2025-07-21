@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-export function Signature() {
+export function Signature(props) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isClear, setIsClear] = useState(true);
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = props.photo
 
   useEffect(() => {
     prepareCanvas();
@@ -16,7 +16,6 @@ export function Signature() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    console.log(canvas);
     canvas.width = window.innerWidth * 2;
     canvas.height = window.innerHeight * 2;
     canvas.style.width = `${window.innerWidth/2}px`;
@@ -28,13 +27,11 @@ export function Signature() {
     context.strokeStyle = "black";
     context.lineWidth = 3;
     contextRef.current = context;
-    console.log("canvas prepared");
     setIsClear(true);
   };
 
   const startDrawing = ({ nativeEvent }) => {
     if (!contextRef.current) {
-      console.log("Context not ready, preparing canvas...");
       prepareCanvas();
       if (!contextRef.current) return; // Still not ready, abort
     }
@@ -43,7 +40,6 @@ export function Signature() {
     contextRef.current.beginPath();
     contextRef.current.moveTo(offsetX, offsetY);
     setIsDrawing(true);
-    console.log("drawing started");
   };
 
   const finishDrawing = () => {
@@ -53,7 +49,6 @@ export function Signature() {
     contextRef.current.closePath();
     setIsDrawing(false);
     setIsClear(false);
-    console.log("drawing finished");
   };
 
   const draw = ({ nativeEvent }) => {
@@ -63,7 +58,6 @@ export function Signature() {
     const { offsetX, offsetY } = nativeEvent;
     contextRef.current.lineTo(offsetX, offsetY);
     contextRef.current.stroke();
-    console.log(offsetX, offsetY);
   };
 
   const clearCanvas = () => {
@@ -80,7 +74,6 @@ export function Signature() {
     const canvas = canvasRef.current;
     const dataURL = canvas.toDataURL('image/png');
     setPhoto(dataURL);
-    console.log('Photo captured:', dataURL);
   };
 
   const handleRetry = () => {
