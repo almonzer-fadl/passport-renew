@@ -52,7 +52,7 @@ export function Login(){
         <>
         {error? alert(error):null}
 
-        <div className="min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-200 rounded-2xl p-10 flex-col justify-center align-middle  border-dashed border-2 border-blue-300">
+        <div className="min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-100 rounded-2xl p-10 flex-col justify-center align-middle  border-dashed border-2 border-blue-300 text-black">
             <h1
             className="text-5xl mb-5 font-bold">Login</h1>
             <form onSubmit={handleSubmit}>

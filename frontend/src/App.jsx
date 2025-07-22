@@ -4,7 +4,6 @@ import {Login} from './auth/Login'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { Home } from './Home'
 import { ProtectedRoute } from './auth/ProtectedRoute'
-import { FloatingIcons } from './components/FloatingIcons'
 import { Organizer } from './application/Orgnizer'
 import {createContext, useEffect, useRef, useState} from 'react'
 export const organizerContext = createContext()

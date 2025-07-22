@@ -4,6 +4,7 @@ import {organizerContext} from './App'
 import { useNavigate } from "react-router-dom"
 import logoutIcon from "./assets/logout.svg"
 import {useAuth} from "./auth/AuthContext"
+import {UserDashboard} from './components/user-dashboard-list'
 
 export function Home(){
 
@@ -11,7 +12,7 @@ export function Home(){
     const {logout} = useAuth()
 
     return(
-        <div className="bg-blue-50 min-h-dvh">
+        <div className="bg-white min-h-dvh">
             <header className="bg-blue-800 text-white text-4xl font-bold p-5 flex justify-between align-middle">
 
             <h1 className="text-center"> Passport Renewal Service</h1>
@@ -21,6 +22,9 @@ export function Home(){
                 <button className="btn btn-primary" onClick={()=>{navigate('/application')}}>Start New Application</button>
                 
             </div>
+            <UserDashboard/>
+
+            
         </div>
     )
 }

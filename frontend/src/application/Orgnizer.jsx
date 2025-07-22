@@ -12,17 +12,64 @@ import { useAuth } from '../auth/AuthContext'
 export function Organizer(){
     const {user} = useAuth()
     //initializing variables for the whole application creation process
-    const [fullname, setFullname] = useState("mohannad")
-    const [passportNo, setPassportNo] = useState("AA123456")
-    const [nationalNo, setNationalNo] = useState("222-222-1234")
-    const [birthPlace, setBirthPlace] = useState("city")
-    const [birthday, setBirthday] = useState(new Date().toISOString().split('T')[0])
-    const [expiry, setExpiry] = useState("10/26")
+    const [fullname, setFullname] = useState("")
+    const [passportNo, setPassportNo] = useState("")
+    const [nationalNo, setNationalNo] = useState("")
+    const [birthPlace, setBirthPlace] = useState("")
+    const [birthday, setBirthday] = useState("")
+    const [expiry, setExpiry] = useState("")
     const [personalPhoto, setPersonalPhoto] = useState(null)
     const [passportPhoto, setPassportPhoto] = useState(null)
     const [signature, setSignature] = useState(null)
     const [location, setLocation] = useState("")
     const [inSudan, setInSudan] = useState('')
+    const [step, setStep] = useState(0)
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+    // Load state from localStorage on component mount
+    useEffect(() => {
+        const savedData = localStorage.getItem('applicationFormData');
+        console.log(JSON.parse(savedData));
+        
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            setFullname(data.fullname || '');
+            setPassportNo(data.passportNo || '');
+            setNationalNo(data.nationalNo || '');
+            setBirthPlace(data.birthPlace || '');
+            setBirthday(data.birthday || '');
+            setExpiry(data.expiry || '');
+            setPersonalPhoto(data.personalPhoto || null);
+            setPassportPhoto(data.passportPhoto || null);
+            setSignature(data.signature || null);
+            setLocation(data.location || '');
+            setInSudan(data.inSudan || '');
+            setStep(data.step || 0);
+        }
+        setIsInitialLoad(false);
+    }, []); // Empty dependency array ensures this runs only once on mount
+
+    // Save state to localStorage whenever it changes
+    useEffect(() => {
+        if (!isInitialLoad) {
+            const applicationData = {
+                fullname,
+                passportNo,
+                nationalNo,
+                birthPlace,
+                birthday,
+                expiry,
+                personalPhoto,
+                passportPhoto,
+                signature,
+                location,
+                inSudan,
+                step
+            };
+            localStorage.setItem('applicationFormData', JSON.stringify(applicationData));
+        }
+    }, [isInitialLoad, fullname, passportNo, nationalNo, birthPlace, birthday, expiry, personalPhoto, passportPhoto, signature, location, inSudan, step]);
+
 
     const basicInfoPayload = {
         fullname,setFullname,
@@ -36,7 +83,6 @@ export function Organizer(){
   
     
     //local variables
-    const [step, setStep] = useState(0)
     const stepList = ["Basic Information","Personal Photo","Passport Photo","signature","Location"]
     const pages = [
         <BasicInformation payload={basicInfoPayload}/>, 
@@ -45,7 +91,6 @@ export function Organizer(){
         <Signature photo={[signature, setSignature]}/>,
         <Location location={[location,setLocation]} inSudan={[inSudan, setInSudan]}/>
     ]
-    const [showPopup,setShowPopup] = useState(false)
     const navigate = useNavigate()
      const stepComplete = [
         fullname && passportNo && nationalNo && birthPlace && birthday && expiry,
@@ -100,6 +145,7 @@ export function Organizer(){
         )
         if (response.ok){
             alert("submitted successfully")
+            localStorage.removeItem('applicationFormData');
             navigate('/home')
             return
         }
@@ -118,14 +164,6 @@ export function Organizer(){
 
   
 
-        {showPopup && <Popup 
-        closeFunc={()=>{navigate('/home')
-            setShowPopup(false) }
-        }
-        returnFunc={()=>{
-            setShowPopup(false)            
-        }}
-            ></Popup>}
        <div>
             
 
@@ -133,11 +171,30 @@ export function Organizer(){
 
             <h1 className='text-4xl text-white font-bold'>Create New Application</h1>
             <button className=' w-10 h-10 justify-self-end cursor-pointer' onClick={()=>{
-                navigate('/home')
-                console.log("cancel button clicked", showPopup)
+                document.getElementById('exit-modal').showModal()
+                console.log("cancel button clicked")
             }}>
+
+                
                 <img src={cancelImg} alt="cancel Icon" />
             </button>
+
+    <dialog id="exit-modal" className="modal">
+        <div className="modal-box bg-blue-100">
+            <h3 className="font-bold text-lg ">Are you sure you want to exit?</h3>
+            <p className="py-4">Press ESC key or click Go Back to close</p>
+            <div className="modal-backdrop modal-action" method="dialog">
+            <button className='btn-primary btn' onClick={()=>document.getElementById('exit-modal').close()}>Cancel</button>
+            <button className='btn-error btn text-gray-100' onClick={
+                ()=>{
+                    document.getElementById('exit-modal').close()
+                    navigate('/home')
+                }
+                }>Exit</button>
+            </div>
+        </div>
+    </dialog>
+
             </header>
             <h2 className="text-3xl my-10">Step {step+1}/{stepList.length}: <span className='bg-blue-200 text-black rounded-4xl p-2 px-4'>{stepList[step]}</span></h2>
             <form onSubmit={e=>e.preventDefault()}>

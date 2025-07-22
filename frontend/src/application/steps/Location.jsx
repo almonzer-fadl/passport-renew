@@ -17,8 +17,8 @@ export function Location(props){
              <option value="" disabled hidden>
         Choose an option
             </option>
-            <option value="sudan">Khartoum</option>
-            <option value="outside">Portsudan</option>
+            <option value="Khartoum">Khartoum</option>
+            <option value="Portsudan">Portsudan</option>
         </select>
        </div>)
 

@@ -58,7 +58,7 @@ export function Register(){
         <>
         {error? alert(error):null}
 
-        <div className="min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-200 rounded-2xl p-10 flex-col justify-center align-middle  border-dashed border-2 border-blue-300">
+        <div className="text-black min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-100 rounded-2xl p-10 flex-col justify-center align-middle  border-dashed border-2 border-blue-300">
             <h1 className="text-5xl mb-5 font-bold">Register</h1>
             <form onSubmit={handleSubmit}>
                 <div className="no-flex">
