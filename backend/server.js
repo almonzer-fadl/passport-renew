@@ -91,7 +91,8 @@ app.post('/api/register', async(req,res)=>{
       user: {
         id: newUser._id,
         username: newUser.username,
-        email: newUser.email
+        email: newUser.email,
+        applications: newUser.applications
       }
     });
 
@@ -127,7 +128,8 @@ app.post('/api/login', async (req,res)=>{
         user: {
             id:user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            applications: user.applications
         }
     })
    }catch(error){
@@ -147,7 +149,8 @@ app.get('/api/verify-token', authenticateToken,async(req,res)=>{
          user: {
             id:user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            applications: user.applications
         }
     })
 })
