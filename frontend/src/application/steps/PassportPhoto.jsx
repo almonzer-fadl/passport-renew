@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import Tesseract from 'tesseract.js'
 
 export function PassportPhoto(props) {
     const [photo, setPhoto] = props.photo
@@ -8,8 +9,13 @@ export function PassportPhoto(props) {
     const canvasRef = useRef(null)
     const intervalRef = useRef(null)
     const [cameraDimensions, setCameraDimensions] = useState({width: 0, height: 0})
-
-
+    const [error, setError] = useState("");
+    
+    // New states for document detection and text extraction
+    const [documentDetected, setDocumentDetected] = useState(false)
+    const [isProcessingText, setIsProcessingText] = useState(false)
+    const [passportNumber, setPassportNumber] = useState("")
+    const [extractedText, setExtractedText] = useState("")
 
     useEffect(() => {
         const calculateDimensions = () => {
@@ -51,9 +57,49 @@ export function PassportPhoto(props) {
         }
     }, [stream]);
 
+    // Document detection using edge detection
+    const detectDocument = (canvas) => {
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Convert to grayscale and apply simple edge detection
+        let edgeCount = 0;
+        const threshold = 50;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            
+            // Simple edge detection by checking neighboring pixels
+            const x = (i / 4) % canvas.width;
+            const y = Math.floor((i / 4) / canvas.width);
+            
+            if (x > 0 && x < canvas.width - 1 && y > 0 && y < canvas.height - 1) {
+                const nextPixelIndex = i + 4;
+                const nextR = data[nextPixelIndex];
+                const nextG = data[nextPixelIndex + 1];
+                const nextB = data[nextPixelIndex + 2];
+                const nextGray = 0.299 * nextR + 0.587 * nextG + 0.114 * nextB;
+                
+                if (Math.abs(gray - nextGray) > threshold) {
+                    edgeCount++;
+                }
+            }
+        }
+        
+        // If we have enough edges, likely a document is present
+        const edgeRatio = edgeCount / (canvas.width * canvas.height);
+        return edgeRatio < 0.001; // Adjust this threshold as needed
+    };
+
     const startCamera = async () => {
         try {
             setPhoto(null);
+            setPassportNumber("");
+            setExtractedText("");
             // Request camera with preferred resolution
             const cameraStream = await navigator.mediaDevices.getUserMedia({ 
                 video: {
@@ -73,6 +119,9 @@ export function PassportPhoto(props) {
             stream.getTracks().forEach(track => track.stop());
         }
         setStream(null);
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
     }
     
     const cancel = () => {
@@ -83,31 +132,42 @@ export function PassportPhoto(props) {
         setPhoto(null);
         setStream(null);
         setPhotoBlob(null);
+        setDocumentDetected(false);
+        setPassportNumber("");
+        setExtractedText("");
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
     }
-    const handlePlay = ()=>{
-         if (intervalRef.current) {
-         clearInterval(intervalRef.current);
-    }
-        intervalRef.current = setInterval(()=>{
-           canvasRef.current = document.createElement('canvas')
-           const tempCtx = canvasRef.current.getContext('2d');
-           canvasRef.current.width = cameraDimensions.width;
-           canvasRef.current.height = cameraDimensions.height;
-           drawVideoToCanvas(tempCtx, videoRef.current, cameraDimensions.width, cameraDimensions.height);
+
+    const handlePlay = () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(() => {
+            if (!videoRef.current) return;
             
-
-        },100)
-
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = cameraDimensions.width;
+            tempCanvas.height = cameraDimensions.height;
+            drawVideoToCanvas(tempCtx, videoRef.current, cameraDimensions.width, cameraDimensions.height);
+            
+            // Check for document presence
+            const hasDocument = detectDocument(tempCanvas);
+            setDocumentDetected(hasDocument);
+        }, 500) // Check every 500ms to avoid performance issues
     }
     
-    const takePhoto = () => {
+    const takePhoto = async () => {
         const video = videoRef.current;
-        const canvas = canvasRef.current;
-        if (!video || !canvas) {
-            //TODO: Find why this canvas is never having a value
-            console.log("no canvas");
+        if (!video) {
+            console.log("no video");
             return;
         }
+
+        // Create a new canvas for the final photo
+        const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         
         // Set canvas to desired aspect ratio
@@ -121,9 +181,30 @@ export function PassportPhoto(props) {
         const imageDataURL = canvas.toDataURL('image/png');
         setPhoto(imageDataURL);
         
-        // Convert to blob for saving
-        canvas.toBlob((blob) => {
+        // Convert to blob for saving and text extraction
+        canvas.toBlob(async (blob) => {
             setPhotoBlob(blob);
+            
+            // Extract text from the captured image
+            setIsProcessingText(true);
+            try {
+                const text = await extractTextOptimized(blob);
+                setExtractedText(text);
+                
+                // Check for passport number
+                const foundPassportNumber = extractPassportNumber(text);
+                if (foundPassportNumber) {
+                    setPassportNumber(foundPassportNumber);
+                    setError("");
+                } else {
+                    setError("No passport number found in the image. Please retake with a clearer view of the passport.");
+                }
+            } catch (err) {
+                console.error('Text extraction error:', err);
+                setError("Failed to extract text from image. Please try again.");
+            } finally {
+                setIsProcessingText(false);
+            }
         }, 'image/png');
         
         stopCamera();
@@ -150,9 +231,83 @@ export function PassportPhoto(props) {
         
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
     };
+
+    async function extractTextOptimized(imageFile) {
+        const worker = await Tesseract.createWorker();
+        
+        try {
+            await worker.loadLanguage('eng');
+            await worker.initialize('eng');
+            
+            // Configure for better performance and passport text recognition
+            await worker.setParameters({
+                tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.:/- ',
+                tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+            });
+            
+            const { data: { text } } = await worker.recognize(imageFile);
+            await worker.terminate();
+            
+            return text;
+        } catch (error) {
+            await worker.terminate();
+            throw error;
+        }
+    }
+
+    // Function to extract passport number from text
+    const extractPassportNumber = (text) => {
+        // Clean the text and convert to uppercase for easier matching
+        const cleanText = text.toUpperCase().replace(/\s+/g, ' ');
+        
+        // Look for "PASSPORT NO." or similar patterns
+        const passportPatterns = [
+            /PASSPORT\s+NO\.?\s*:?\s*([A-Z0-9]{6,12})/i,
+            /PASSPORT\s+NUMBER\s*:?\s*([A-Z0-9]{6,12})/i,
+            /PASSPORT\s*:?\s*([A-Z0-9]{6,12})/i,
+            /NO\.?\s*:?\s*([A-Z0-9]{6,12})/i
+        ];
+        
+        for (const pattern of passportPatterns) {
+            const match = cleanText.match(pattern);
+            if (match && match[1]) {
+                // Validate passport number format (usually 1-2 letters followed by 6-8 digits)
+                const passportNum = match[1].trim();
+                if (/^[A-Z]{0,2}[0-9]{6,8}$/.test(passportNum) || /^[A-Z0-9]{6,12}$/.test(passportNum)) {
+                    return passportNum;
+                }
+            }
+        }
+        
+        return null;
+    };
    
     return (
         <>
+            <div role="alert" className="alert alert-info">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>Please take a photo of your old passport, make sure it is clear and readable.</span>
+            </div>
+            
+            {error && <div role="alert" className="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span>{error}</span>
+            </div>}
+
+            {passportNumber && (
+                <div role="alert" className="alert alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Passport Number detected: <strong>{passportNumber}</strong></span>
+                </div>
+            )}
+
+            {isProcessingText && (
+                <div role="alert" className="alert alert-info">
+                    <span className="loading loading-spinner loading-sm"></span>
+                    <span>Processing image and extracting text...</span>
+                </div>
+            )}
+            
             {!stream && !photo && (
                 <div className="min-h-50 flex justify-center align-middle rounded-2xl border-2 m-4 border-dashed">
                     <button
@@ -179,36 +334,59 @@ export function PassportPhoto(props) {
                         }}
                     />
 
-                    <div className='absolute top-1/2 left-1/2 -translate-1/2 border-white border-4 border-dashed rounded-2xl'
+                    {/* Document detection overlay */}
+                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-4 border-dashed rounded-2xl transition-colors ${
+                        documentDetected ? 'border-green-400' : 'border-white'
+                    }`}
                       style={{
                             width: cameraDimensions.width * 0.9,
-                            height: cameraDimensions.height *0.9,
+                            height: cameraDimensions.height * 0.9,
                             objectFit: "cover"
                         }}
-                    ></div>
+                    >
+                        {/* Document detection indicator */}
+                        <div className={`absolute top-2 left-2 px-2 py-1 rounded text-sm font-bold ${
+                            documentDetected 
+                                ? 'bg-green-500 text-white' 
+                                : 'bg-red-500 text-white'
+                        }`}>
+                            {documentDetected ? 'Document Detected' : 'No Document'}
+                        </div>
+                    </div>
 
-                    <div className='flex justify-center gap-10 pt-5 absolute bottom-1/10'>
+                    <div className='flex justify-center gap-10 pt-5 absolute bottom-20'>
                         <button onClick={stopCamera} className='btn'>Cancel</button>
-                        <button onClick={takePhoto} className='btn btn-primary'>Take</button>
+                        <button 
+                            onClick={takePhoto} 
+                            className={`btn ${documentDetected ? 'btn-primary' : 'btn-disabled'}`}
+                            disabled={!documentDetected}
+                        >
+                            {documentDetected ? 'Take Photo' : 'Position Document'}
+                        </button>
                     </div>
                 </div>
             )}
             
             {photo && (
                 <div className='flex flex-col items-center m-10'>
-                    {/* <canvas
-                        ref={canvasRef}
-                        className='none'
-                       
-                    /> */}
                     <img 
-                    className='p-4 border-4 border-gray-400 border-dashed'
-                      style={{
+                        className='p-4 border-4 border-gray-400 border-dashed'
+                        style={{
                             width: cameraDimensions.width/2,
                             height: cameraDimensions.height/2,
                             objectFit: "cover"
                         }}
-                    src={photo}></img>
+                        src={photo}
+                        alt="Captured passport"
+                    />
+                    
+                    {/* Show extracted text for debugging */}
+                    {extractedText && (
+                        <div className="mt-4 p-4 bg-gray-100 rounded max-w-full overflow-auto">
+                            <h4 className="font-bold">Extracted Text:</h4>
+                            <pre className="text-xs whitespace-pre-wrap">{extractedText}</pre>
+                        </div>
+                    )}
                     
                     <div className='flex justify-center gap-10 pt-5'>
                         <button onClick={cancel} className='btn'>Remove</button>

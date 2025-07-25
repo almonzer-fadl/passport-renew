@@ -12,12 +12,15 @@ import { useAuth } from '../auth/AuthContext'
 export function Organizer(){
     const {user} = useAuth()
     //initializing variables for the whole application creation process
-    const [fullname, setFullname] = useState("")
+    const [fullnameEn, setFullnameEn] = useState("")
+    const [fullnameAr, setFullnameAr] = useState("")
     const [passportNo, setPassportNo] = useState("")
     const [nationalNo, setNationalNo] = useState("")
     const [birthPlace, setBirthPlace] = useState("")
     const [birthday, setBirthday] = useState("")
-    const [expiry, setExpiry] = useState("")
+    const [expiryDate, setExpiryDate] = useState("")
+    const [issueDate, setIssueDate] = useState("")
+    const [gender , setGender] = useState("")
     const [personalPhoto, setPersonalPhoto] = useState(null)
     const [passportPhoto, setPassportPhoto] = useState(null)
     const [signature, setSignature] = useState(null)
@@ -33,12 +36,15 @@ export function Organizer(){
         
         if (savedData) {
             const data = JSON.parse(savedData);
-            setFullname(data.fullname || '');
+            setFullnameEn(data.fullnameEn || '');
+            setFullnameAr(data.fullnameAr || '');
             setPassportNo(data.passportNo || '');
             setNationalNo(data.nationalNo || '');
             setBirthPlace(data.birthPlace || '');
             setBirthday(data.birthday || '');
-            setExpiry(data.expiry || '');
+            setExpiryDate(data.expiryDate || '');
+            setIssueDate(data.issueDate || '');
+            setGender(data.gender||'');
             setPersonalPhoto(data.personalPhoto || null);
             setPassportPhoto(data.passportPhoto || null);
             setSignature(data.signature || null);
@@ -53,12 +59,15 @@ export function Organizer(){
     useEffect(() => {
         if (!isInitialLoad) {
             const applicationData = {
-                fullname,
+                fullnameEn,
+                fullnameAr,
                 passportNo,
                 nationalNo,
                 birthPlace,
                 birthday,
-                expiry,
+                expiryDate,
+                issueDate,
+                gender,
                 personalPhoto,
                 passportPhoto,
                 signature,
@@ -68,16 +77,19 @@ export function Organizer(){
             };
             localStorage.setItem('applicationFormData', JSON.stringify(applicationData));
         }
-    }, [isInitialLoad, fullname, passportNo, nationalNo, birthPlace, birthday, expiry, personalPhoto, passportPhoto, signature, location, inSudan, step]);
+    }, [isInitialLoad, fullnameEn, fullnameAr,passportNo, nationalNo, birthPlace, birthday, expiryDate, issueDate,gender, personalPhoto, passportPhoto, signature, location, inSudan, step]);
 
 
     const basicInfoPayload = {
-        fullname,setFullname,
+        fullnameEn,setFullnameEn,
+        fullnameAr,setFullnameAr,
         passportNo,setPassportNo,
         nationalNo, setNationalNo,
         birthPlace, setBirthPlace,
         birthday, setBirthday,
-        expiry, setExpiry
+        expiryDate, setExpiryDate,
+        issueDate, setIssueDate,
+        gender, setGender
     }
 
   
@@ -93,7 +105,7 @@ export function Organizer(){
     ]
     const navigate = useNavigate()
      const stepComplete = [
-        fullname && passportNo && nationalNo && birthPlace && birthday && expiry,
+        fullnameEn&& fullnameAr && passportNo && nationalNo && birthPlace && birthday && expiryDate&& issueDate && gender,
         personalPhoto !== null,
         passportPhoto !== null,
         signature !== null,
@@ -129,12 +141,15 @@ export function Organizer(){
                 }, body:JSON.stringify({
                     "email":user.email,
                     'application':{
-                        fullname,
+                        fullnameAr,
+                        fullnameEn,
                         passportNo,
                         nationalNo,
                         birthPlace,
                         birthday,
-                        expiry,
+                        issueDate,
+                        expiryDate,
+                        gender,
                         location,
                         signature,
                         passportPhoto,
@@ -161,9 +176,6 @@ export function Organizer(){
 
     return(
        <div className='absolute w-full bg-blue-50 text-black  p-10 min-h-dvh flex flex-col justify-between align-middle'>
-
-  
-
        <div>
             
 
@@ -196,7 +208,13 @@ export function Organizer(){
     </dialog>
 
             </header>
-            <h2 className="text-3xl my-10">Step {step+1}/{stepList.length}: <span className='bg-blue-200 text-black rounded-4xl p-2 px-4'>{stepList[step]}</span></h2>
+            <ul className="steps w-full my-5">
+  {stepList.map((title,index)=>(
+     <li key={index} className={`step ${index<=step?"step-primary":""}`}>{title}</li>
+  ))}
+ 
+</ul>
+            {/* <h2 className="text-3xl my-10">Step {step+1}/{stepList.length}: <span className='bg-blue-200 text-black rounded-4xl p-2 px-4'>{stepList[step]}</span></h2> */}
             <form onSubmit={e=>e.preventDefault()}>
                 {pages[step]}
             </form>

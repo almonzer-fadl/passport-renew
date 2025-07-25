@@ -8,8 +8,7 @@ export const UserDashboard = () => {
   // Sample data - replace with your actual data
   const {user} = useAuth()
   const applications = user.applications
-
-   
+  console.log(applications)
 
   const filters = ['All', 'Approved', 'Pending', 'Rejected'];
 
@@ -51,7 +50,7 @@ export const UserDashboard = () => {
 
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen lg:max-w-2/3 m-auto">
       {/* Header */}
       <div className="border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between px-6 py-4">
@@ -73,15 +72,11 @@ export const UserDashboard = () => {
                 </svg>
               </div>
             </div>
-           
           </div>
         </div>
       </div>
 
       <div className="flex">
-       
-
-
         {/* Main Content */}
         <div className="flex-1">
           {/* Filter Tabs */}
@@ -136,12 +131,12 @@ export const UserDashboard = () => {
                     <img
                       className="h-16 w-12 rounded-xl object-cover"
                       src={app.personalPhoto}
-                      alt={app.fullName}
+                      alt={app.fullNameEn}
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900">{app.fullname}</p>
-                    <p className="text-xs text-gray-500">{app.fullname}</p>
+                    <p className="text-sm font-medium text-gray-900">{app.fullnameEn}</p>
+                    <p className="text-xs text-gray-500">{app.fullnameAr}</p>
                     <p className="text-xs text-gray-400 font-mono overflow-ellipsis">{app._id}</p>
                   </div>
                 </div>

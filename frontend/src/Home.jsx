@@ -20,8 +20,8 @@ export function Home(){
             </header>
             <div className=" text-gray-950 flex justify-center align-middle h-full m-10 p-10 border-2 border-gray-400 border-dashed dash rounded-2xl">
                 <button className="btn btn-primary" onClick={()=>{navigate('/application')}}>Start New Application</button>
-                
             </div>
+
             <UserDashboard/>
 
             

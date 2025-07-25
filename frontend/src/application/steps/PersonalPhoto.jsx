@@ -13,6 +13,8 @@ export default function PersonalPhoto(props) {
   const [isFace,setIsFace] = useState(false)
   const [hasWhiteBackground, setHasWhiteBackground] = useState(false);
   const [cameraDimensions, setCameraDimensions] = useState({ width: 0, height: 0 });
+  const [error, setError] = useState("");
+  const [isFrontCamera, setIsFrontCamera] = useState(false);
 
   
 
@@ -221,6 +223,9 @@ export default function PersonalPhoto(props) {
         }
       });
       setStream(cameraStream);
+      const videoTrack = cameraStream.getVideoTracks()[0];
+      const settings = videoTrack.getSettings();
+      setIsFrontCamera(settings.facingMode === 'user');
     } catch (err) {
       console.error('Error accessing camera:', err);
     }
@@ -266,6 +271,14 @@ export default function PersonalPhoto(props) {
 
   return (
     <div className=''>
+        <div role="alert" className="alert alert-info">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Please provide a clear photo of your face with a white background.</span>
+        </div>
+        {error && <div role="alert" className="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{error}</span>
+        </div>}
       
       <div className={!photo?' min-h-50 flex justify-center align-middle border-2 m-4 border-dashed rounded-2xl':""}>
         {!stream && !photo ? (
@@ -333,7 +346,8 @@ export default function PersonalPhoto(props) {
             style={{
               width:cameraDimensions.width,
               height:cameraDimensions.height,
-              objectFit: 'cover'
+              objectFit: 'cover',
+              transform: isFrontCamera ? 'scaleX(-1)' : 'none'
             }}
           />
           <canvas

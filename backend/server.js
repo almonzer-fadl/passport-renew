@@ -163,8 +163,8 @@ app.post('/api/create-app'  ,async(req,res)=>{
     if(!user){
         return res.status(404).json({message : "User not found"})
     }
-    if(!application.fullname){
-        return res.status(402).json({message:"data is missing"})
+    if(!application){
+        return res.status(400).json({message:"data is missing"})
     }
    
 
@@ -178,7 +178,9 @@ app.post('/api/create-app'  ,async(req,res)=>{
         personalPhoto:application.personalPhoto,
         passportPhoto:application.passportPhoto,
         signature:application.signature,
-        expiry:application.expiry,
+        expiryDate:application.expiryDate,
+        issueDate:application.issueDate,
+        gender:application.gender,
         location:application.location,
         dateCreated:new Date().toISOString("").split("T")[0],
         status:"pending",
@@ -191,15 +193,17 @@ app.post('/api/create-app'  ,async(req,res)=>{
 
 })
 
-app.get('/api/user-applications', async(req,res)=>{
-    const user = await findUSerByEmail(req.body.email)
-    if(!user){
-        return res.status(404).json({message : "User not found"})
-    }
-    const applications = user.applications
-    return res.status(200).send(applications)
+//   NOTE: Currently unused but may be more effective than current approach
 
-})
+// app.get('/api/user-applications', async(req,res)=>{
+//     const user = await findUSerByEmail(req.body.email)
+//     if(!user){
+//         return res.status(404).json({message : "User not found"})
+//     }
+//     const applications = user.applications
+//     return res.status(200).send(applications)
+
+// })
 
 
 
