@@ -170,7 +170,8 @@ app.post('/api/create-app'  ,async(req,res)=>{
 
     const newApplication = {
         accountID:user._id,
-        fullname:application.fullname,
+        fullnameEn:application.fullnameEn,
+        fullnameAr:application.fullnameAr,
         passportNo:application.passportNo,
         nationalNo:application.nationalNo,
         birthPlace:application.birthPlace,

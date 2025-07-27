@@ -14,7 +14,7 @@ export function PassportPhoto(props) {
     // New states for document detection and text extraction
     const [documentDetected, setDocumentDetected] = useState(false)
     const [isProcessingText, setIsProcessingText] = useState(false)
-    const [passportNumber, setPassportNumber] = useState("")
+    const [sdnDetected, setSdnDetected] = useState(false)
     const [extractedText, setExtractedText] = useState("")
 
     useEffect(() => {
@@ -98,7 +98,7 @@ export function PassportPhoto(props) {
     const startCamera = async () => {
         try {
             setPhoto(null);
-            setPassportNumber("");
+            setSdnDetected(false);
             setExtractedText("");
             // Request camera with preferred resolution
             const cameraStream = await navigator.mediaDevices.getUserMedia({ 
@@ -133,7 +133,7 @@ export function PassportPhoto(props) {
         setStream(null);
         setPhotoBlob(null);
         setDocumentDetected(false);
-        setPassportNumber("");
+        setSdnDetected(false);
         setExtractedText("");
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
@@ -190,14 +190,16 @@ export function PassportPhoto(props) {
             try {
                 const text = await extractTextOptimized(blob);
                 setExtractedText(text);
+                console.log(text)
                 
-                // Check for passport number
-                const foundPassportNumber = extractPassportNumber(text);
-                if (foundPassportNumber) {
-                    setPassportNumber(foundPassportNumber);
+                // Check for SDN in the text
+                const hasSDN = checkForSDN(text);
+                if (hasSDN) {
+                    setSdnDetected(true);
                     setError("");
                 } else {
-                    setError("No passport number found in the image. Please retake with a clearer view of the passport.");
+                    setPhoto(null)
+                    setError("SDN not found in the document. Please retake with a clear view of a Sudanese passport.");
                 }
             } catch (err) {
                 console.error('Text extraction error:', err);
@@ -232,61 +234,51 @@ export function PassportPhoto(props) {
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
     };
 
+    // Fixed Tesseract implementation
     async function extractTextOptimized(imageFile) {
-        const worker = await Tesseract.createWorker();
-        
         try {
-            await worker.loadLanguage('eng');
-            await worker.initialize('eng');
+            console.log('Starting text extraction...');
             
-            // Configure for better performance and passport text recognition
-            await worker.setParameters({
-                tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.:/- ',
-                tessedit_pageseg_mode: Tesseract.PSM.AUTO,
-            });
+            // Use the direct recognize method with options
+            const { data: { text } } = await Tesseract.recognize(
+                imageFile,
+                'eng',
+                {
+                    logger: m => console.log('Tesseract progress:', m),
+                    tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.:/- ',
+                    tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+                }
+            );
             
-            const { data: { text } } = await worker.recognize(imageFile);
-            await worker.terminate();
-            
+            console.log('Text extraction completed');
             return text;
         } catch (error) {
-            await worker.terminate();
+            console.error('Tesseract error:', error);
             throw error;
         }
     }
 
-    // Function to extract passport number from text
-    const extractPassportNumber = (text) => {
-        // Clean the text and convert to uppercase for easier matching
-        const cleanText = text.toUpperCase().replace(/\s+/g, ' ');
-        
-        // Look for "PASSPORT NO." or similar patterns
-        const passportPatterns = [
-            /PASSPORT\s+NO\.?\s*:?\s*([A-Z0-9]{6,12})/i,
-            /PASSPORT\s+NUMBER\s*:?\s*([A-Z0-9]{6,12})/i,
-            /PASSPORT\s*:?\s*([A-Z0-9]{6,12})/i,
-            /NO\.?\s*:?\s*([A-Z0-9]{6,12})/i
-        ];
-        
-        for (const pattern of passportPatterns) {
-            const match = cleanText.match(pattern);
-            if (match && match[1]) {
-                // Validate passport number format (usually 1-2 letters followed by 6-8 digits)
-                const passportNum = match[1].trim();
-                if (/^[A-Z]{0,2}[0-9]{6,8}$/.test(passportNum) || /^[A-Z0-9]{6,12}$/.test(passportNum)) {
-                    return passportNum;
-                }
+    // Function to check for SDN in text
+    const checkForSDN = (text) => {
+        const cleanText = text.toUpperCase().replace(/\s+/g, ' ').replace(/[|]/g, 'I');
+        console.log('Checking for SDN in text:', cleanText);
+        const commonFields = [
+            'SDN', 'SUDAN', 'PC', 'PASSPORT'
+        ]
+        for (const field in commonFields){
+            if (cleanText.includes(field)){
+                return true
             }
         }
         
-        return null;
+        return false;
     };
    
     return (
         <>
             <div role="alert" className="alert alert-info">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span>Please take a photo of your old passport, make sure it is clear and readable.</span>
+                <span>Please take a photo of your Sudanese passport, make sure it is clear and readable.</span>
             </div>
             
             {error && <div role="alert" className="alert alert-error">
@@ -294,17 +286,17 @@ export function PassportPhoto(props) {
                 <span>{error}</span>
             </div>}
 
-            {passportNumber && (
+            {sdnDetected && (
                 <div role="alert" className="alert alert-success">
                     <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>Passport Number detected: <strong>{passportNumber}</strong></span>
+                    <span>Sudanese passport detected! You can continue.</span>
                 </div>
             )}
 
             {isProcessingText && (
                 <div role="alert" className="alert alert-info">
                     <span className="loading loading-spinner loading-sm"></span>
-                    <span>Processing image and extracting text...</span>
+                    <span>Processing image and checking for SDN...</span>
                 </div>
             )}
             
@@ -322,7 +314,7 @@ export function PassportPhoto(props) {
             {stream && !photo && (
                 <div className='bg-white absolute top-0 left-0  w-full h-dvh flex align-middle justify-center z-10'>
                     <video 
-                        className='my-auto'
+                        className='my-auto -scale-x-100'
                         autoPlay
                         onPlay={handlePlay}
                         muted

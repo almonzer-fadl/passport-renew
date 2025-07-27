@@ -9,6 +9,7 @@ import { PassportPhoto } from './steps/PassportPhoto'
 import {Signature} from './steps/Signature'
 import {Location} from './steps/Location'
 import { useAuth } from '../auth/AuthContext'
+import { Review } from './steps/Review'
 export function Organizer(){
     const {user} = useAuth()
     //initializing variables for the whole application creation process
@@ -95,13 +96,14 @@ export function Organizer(){
   
     
     //local variables
-    const stepList = ["Basic Information","Personal Photo","Passport Photo","signature","Location"]
+    const stepList = ["Basic Information","Personal Photo","Passport Photo","signature","Location", "Review"]
     const pages = [
         <BasicInformation payload={basicInfoPayload}/>, 
         <PersonalPhoto photo={[personalPhoto,setPersonalPhoto]}/>, 
         <PassportPhoto photo={[passportPhoto, setPassportPhoto]}/>,
         <Signature photo={[signature, setSignature]}/>,
-        <Location location={[location,setLocation]} inSudan={[inSudan, setInSudan]}/>
+        <Location location={[location,setLocation]} inSudan={[inSudan, setInSudan]}/>,
+        <Review passport={{fullnameAr, fullnameEn,passportNo,personalPhoto,birthPlace,birthday,signature, gender}}/>
     ]
     const navigate = useNavigate()
      const stepComplete = [
@@ -109,7 +111,8 @@ export function Organizer(){
         personalPhoto !== null,
         passportPhoto !== null,
         signature !== null,
-        location!==""
+        location!=="",
+        true
     ];
 
 
@@ -159,9 +162,7 @@ export function Organizer(){
             }
         )
         if (response.ok){
-            alert("submitted successfully")
             localStorage.removeItem('applicationFormData');
-            navigate('/home')
             return
         }
 
@@ -223,11 +224,26 @@ export function Organizer(){
                 <button 
                 disabled={!stepComplete[step]}
                 className="btn btn-primary disabled:btn-ghost"
-                onClick={step===stepList.length-1?handleSubmit:handleNext} >
+                htmlFor={step===stepList.length-1?"success-modal":""}
+                onClick={step===stepList.length-1?()=>{handleSubmit();document.getElementById("success-modal").showModal()}:handleNext} >
                     {step===stepList.length-1?"Finish":"Next"}
                     </button>
-            
+                 <dialog id="success-modal" className="modal">
+                <div className="modal-box bg-green-600 text-white" >
+                    <h3 className="font-bold text-lg">Application Successful</h3>
+                    <p className="py-4">You can see it in home page</p>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button onClick={()=>{
+                        document.getElementById('success-modal').close()
+                    navigate('/home')
+                    }}>close</button>
+                </form>
+            </dialog>
+                
+                            
             </div>
+           
        </div>
        </div>
     )

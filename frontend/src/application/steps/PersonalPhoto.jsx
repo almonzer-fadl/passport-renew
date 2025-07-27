@@ -12,6 +12,7 @@ export default function PersonalPhoto(props) {
   const intervalRef = useRef(null);
   const [isFace,setIsFace] = useState(false)
   const [hasWhiteBackground, setHasWhiteBackground] = useState(false);
+  const [isFaceCentered, setIsFaceCentered] = useState(false); // New state for face centering
   const [cameraDimensions, setCameraDimensions] = useState({ width: 0, height: 0 });
   const [error, setError] = useState("");
   const [isFrontCamera, setIsFrontCamera] = useState(false);
@@ -117,17 +118,65 @@ export default function PersonalPhoto(props) {
         const context = faceCanvasRef.current.getContext('2d');
         context.clearRect(0, 0, faceCanvasRef.current.width, faceCanvasRef.current.height);
         
+        // Apply mirroring transformation if front camera is used
+        if (isFrontCamera) {
+          context.save();
+          context.scale(-1, 1);
+          context.translate(-cameraDimensions.width, 0);
+        }
+        
         if (resizedDetections.length > 0) {
-          faceapi.draw.drawDetections(faceCanvasRef.current, resizedDetections);
+          // If using front camera, we need to mirror the detection coordinates
+          let drawDetections = resizedDetections;
+          if (isFrontCamera) {
+            drawDetections = resizedDetections.map(detection => {
+              const mirroredBox = {
+                ...detection.box,
+                x: cameraDimensions.width - detection.box.x - detection.box.width
+              };
+              return {
+                ...detection,
+                box: mirroredBox
+              };
+            });
+          }
+          faceapi.draw.drawDetections(faceCanvasRef.current, drawDetections);
+        }
+        
+        // Restore canvas transformation
+        if (isFrontCamera) {
+          context.restore();
         }
 
         // Process face detection results
         if (detections && detections.length > 0) {
           
+          
           const face = detections[0];
           const faceScore = face.score;
-          const box = face.box;
+          let box = face.box;
           
+          // Mirror the box coordinates for front camera for calculations
+          if (isFrontCamera) {
+            box = {
+              ...box,
+              x: cameraDimensions.width - box.x - box.width
+            };
+          }
+
+          // Check if face is centered
+          const faceCenterX = box.x + box.width / 2;
+          const faceCenterY = box.y + box.height / 2;
+          const canvasCenterX = cameraDimensions.width / 2;
+          const canvasCenterY = cameraDimensions.height / 2;
+          
+          // Define tolerance for "centered" (as percentage of canvas dimensions)
+          const centerToleranceX = cameraDimensions.width * 0.15; // 15% tolerance
+          const centerToleranceY = cameraDimensions.height * 0.15; // 15% tolerance
+          
+          const isXCentered = Math.abs(faceCenterX - canvasCenterX) >= centerToleranceX;
+          const isYCentered = Math.abs(faceCenterY - canvasCenterY) <= centerToleranceY;
+          const isCentered = isXCentered && isYCentered;
 
           // Create temporary canvas for background analysis
           const tempCanvas = document.createElement('canvas');
@@ -164,11 +213,12 @@ export default function PersonalPhoto(props) {
           });
 
           // Update state based on detection results
-          const hasGoodFace = faceScore >= 0.5; // Slightly lower threshold for better UX
+          const hasGoodFace = faceScore >= 0.4; // Slightly lower threshold for better UX
           const hasWhiteBg = whitePixelCount >= 3;
           
           setIsFace(hasGoodFace);
           setHasWhiteBackground(hasWhiteBg);
+          setIsFaceCentered(isCentered);
           
           
         } else {
@@ -176,6 +226,7 @@ export default function PersonalPhoto(props) {
           console.log('No faces detected');
           setIsFace(false);
           setHasWhiteBackground(false);
+          setIsFaceCentered(false);
         }
         
       } catch (error) {
@@ -183,7 +234,7 @@ export default function PersonalPhoto(props) {
         // Don't update state on error to avoid flickering
       }
     }
-  }, 200); // Slightly longer interval to reduce CPU usage
+  }, 100); // Slightly longer interval to reduce CPU usage
 };
 
   // Helper function to draw video to canvas with proper cropping for aspect ratio
@@ -275,6 +326,22 @@ export default function PersonalPhoto(props) {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span>Please provide a clear photo of your face with a white background.</span>
         </div>
+        
+        {/* Status indicators */}
+        {stream && (
+          <div className="flex justify-center gap-4 mb-4 z-30 absolute top-1/10 w-full">
+            <div className={`badge p-auto ${isFace ? 'badge-success' : 'badge-error'}`}>
+              {isFace ? '✓ Face Detected' : '✗ No Face'}
+            </div>
+            <div className={`badge p-auto ${isFaceCentered ? 'badge-success' : 'badge-warning'}`}>
+              {isFaceCentered ? '✓ Centered' : '⚠ Move to Center'}
+            </div>
+            <div className={`badge p-auto ${hasWhiteBackground ? 'badge-success' : 'badge-warning'}`}>
+              {hasWhiteBackground ? '✓ White Background' : '⚠ Need White Background'}
+            </div>
+          </div>
+        )}
+        
         {error && <div role="alert" className="alert alert-error">
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             <span>{error}</span>
@@ -297,7 +364,7 @@ export default function PersonalPhoto(props) {
       <div className={stream ? "bg-white absolute top-0 left-0  w-full h-dvh flex align-middle justify-center z-10" : 'none'}>
 
          {stream && (
-          <div className='absolute bottom-1/12 gap-10 flex justify-center'>
+          <div className='absolute bottom-1/12 gap-10 flex justify-center z-20'>
             <button 
             className='btn'
               onClick={stopCamera}
@@ -307,7 +374,7 @@ export default function PersonalPhoto(props) {
             <button 
             className='btn btn-primary'
               onClick={takePhoto}
-               disabled={!isFace || !hasWhiteBackground}
+               disabled={!isFace || !isFaceCentered}
             >
               Take Photo
             </button>
@@ -342,23 +409,30 @@ export default function PersonalPhoto(props) {
             autoPlay 
             muted
             onPlay={handleVideoPlay}
-            className={`${stream && !photo ? 'm-auto' : 'hidden'}`}
+            className={`${stream && !photo ? ('m-auto '+isFrontCamera?"-scale-x-100":"") : 'hidden'}`}
             style={{
               width:cameraDimensions.width,
               height:cameraDimensions.height,
               objectFit: 'cover',
-              transform: isFrontCamera ? 'scaleX(-1)' : 'none'
             }}
           />
+
+          {/* {stream&&<div className={`absolute p-[25%] border-dashed rounded-full min-w-[${cameraDimensions.width}px] min-h-[${cameraDimensions.height}px] border-green-400 border-2 ${!stream?"none hidden":""}`}>
+
+          </div>} */}
           <canvas
           ref={faceCanvasRef}
-          className='hidden none'
+          className={`absolute opacity-40 ${!stream?`none hidden ${isFrontCamera?"-scale-x-100":""}`:""}`}
           style={{
               width:cameraDimensions.width,
               height:cameraDimensions.height,
-              objectFit: 'cover'
+              objectFit: 'cover',
+              transform: 'scaleX(-1)'
+
+              
           }}
           />
+            
       
         </div>
 
