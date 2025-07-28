@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useAuth} from '../auth/AuthContext'
+import PassportModal from './application-view';
 
 export const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -10,8 +11,20 @@ export const UserDashboard = () => {
   const applications = user.applications
   console.log(applications)
 
-  const filters = ['All', 'Approved', 'Pending', 'Rejected'];
+  const [selectedPassport, setSelectedPassport] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handlePassportClick = (passport) => {
+    setSelectedPassport(passport);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPassport(null);
+  };
+
+  const filters = ['All', 'Approved', 'Pending', 'Rejected'];
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved':
@@ -124,7 +137,7 @@ export const UserDashboard = () => {
           <div className="bg-white">
             
             {applications&&applications.map((app, index) => (
-              <div key={user.id} className={`grid grid-cols-12 gap-4 px-5 py-4 border-b border-t border-gray-200 hover:bg-gray-50 overflow-scroll ${index%2==1?"bg-gray-100":"bg-white"}`}>
+              <div key={user.id} onClick={()=>handlePassportClick(app)} className={`grid grid-cols-12 gap-4 px-5 py-4 border-b border-t border-gray-200 hover:bg-gray-50 overflow-scroll ${index%2==1?"bg-gray-100":"bg-white"}`}>
                 {/* Details */}
                 <div className="col-span-3 flex items-center space-x-2">
                   <div className="flex-shrink-0">
@@ -192,6 +205,11 @@ export const UserDashboard = () => {
           </div>
         </div>
       </div>
+       <PassportModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        passportData={selectedPassport}
+      />
        
     </div>
     

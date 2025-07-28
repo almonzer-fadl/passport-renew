@@ -11,5 +11,9 @@ export function ProtectedRoute({children}){
     if(!isAuthenticated){
         return <Navigate to="/login" replace />;
     }
+
+    if(isAuthenticated && window.location.pathname === '/'){
+        return <Navigate to="/home" replace />;
+    }
     return children
 }

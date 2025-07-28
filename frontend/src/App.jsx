@@ -6,6 +6,7 @@ import { Home } from './Home'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { Organizer } from './application/Orgnizer'
 import {createContext, useEffect, useRef, useState} from 'react'
+import TajdeedLanding from './tajdeed-landing'
 export const organizerContext = createContext()
 export default function App() {
   const [isOrganizerRunning, setIsOrganizerRunning] = useState(false)
@@ -22,7 +23,7 @@ export default function App() {
       <organizerContext.Provider value={{isOrganizerRunning,setIsOrganizerRunning}}>
       {isOrganizerRunning && <Organizer></Organizer>}
       <Routes>
-        <Route path="/" element={<ProtectedRoute><Home/></ProtectedRoute>}></Route>
+        <Route path="/" element={<TajdeedLanding/>}></Route>
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
