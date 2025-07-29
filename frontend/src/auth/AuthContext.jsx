@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { createContext, useReducer, useEffect ,useContext} from "react"
-
 export const AuthContext = createContext()
 
 const initialState = {
@@ -60,7 +59,7 @@ export const AuthProvider = ({children})=>{
                 dispatch({type:'SET_LOADING', payload:false})
                 return
             }
-            const response = await fetch('http://localhost:5000/api/verify-token',
+            const response = await fetch(import.meta.env.VITE_REACT_APP_BACKEND_ROUTE+'/api/verify-token',
                 {
                     headers:{
                         "Authorization": `Bearer ${token}`
@@ -90,7 +89,7 @@ export const AuthProvider = ({children})=>{
 
     const register = async(username, email, password)=>{
         try{
-            const response = await fetch('http://localhost:5000/api/register', {
+            const response = await fetch(import.meta.env.VITE_REACT_APP_BACKEND_ROUTE+'/api/register', {
                 method:"POST",
                 headers:{
                     "Content-Type": 'application/json'
@@ -122,7 +121,7 @@ export const AuthProvider = ({children})=>{
 
      const login = async(email, password)=>{
         try{
-            const response = await fetch('http://localhost:5000/api/login', {
+            const response = await fetch(import.meta.env.VITE_REACT_APP_BACKEND_ROUTE+'/api/login', {
                 method:"POST",
                 headers:{
                     "Content-Type": 'application/json'

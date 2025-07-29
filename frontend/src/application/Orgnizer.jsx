@@ -136,7 +136,7 @@ export function Organizer(){
         console.log("starting submittion")
 
         try{
-            const response = await fetch("http://localhost:5000/api/create-app",
+            const response = await fetch(import.meta.env.VITE_REACT_APP_BACKEND_ROUTE+"/api/create-app",
             {
                 method:"POST",
                 headers:{

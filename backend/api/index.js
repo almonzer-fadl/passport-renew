@@ -1,4 +1,5 @@
-require('dotenv').config()
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '.env') })
 
 const express = require('express')
 const cors = require('cors')
@@ -6,11 +7,10 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const fs = require('fs')
-const path = require('path')
-const {userSchema} = require('./userSchema.js')
+const {userSchema} = require('../userSchema.js')
 
 const app = express()
-const PORT = 5000
+const PORT = process.env.PORT
 const JWT_SECRET = process.env.JWT_SECRET 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN
 const MONGODB_URI = process.env.MONGODB_URI
@@ -22,10 +22,7 @@ mongoose.connect(MONGODB_URI)
 
 const corsOptions = {
   origin: [
-    'http://localhost:5173', // React dev server
-    'http://localhost:5174', // Alternative React port
-    'http://127.0.0.1:3000',
-    // Add your production frontend URL when deployed
+    process.env.FRONTEND_ROUTE
   ],
   credentials: true, // Allow cookies and authorization headers
   optionsSuccessStatus: 200 // For legacy browser support
@@ -64,6 +61,10 @@ const authenticateToken = (req,res,next)=>{
     })
 }
 
+app.get('/', (req,res)=>{
+    res.send("Hello from Backend!")
+})
+
 app.post('/api/register', async(req,res)=>{
     try{
         const {username , email , password} = req.body
@@ -100,7 +101,7 @@ app.post('/api/register', async(req,res)=>{
     }catch(err){
         console.log(err);
         
-        return res.status(400).json({error: err})}
+        return res.status(400).json({success:false, error: err})}
 })
 
 app.post('/api/login', async (req,res)=>{
@@ -135,7 +136,7 @@ app.post('/api/login', async (req,res)=>{
    }catch(error){
     console.log("Login error", error);
     
-    return res.status(400).json({message:"Server error"})
+    return res.status(400).json({message:"Server error", error:error})
    }
 })
 
@@ -229,5 +230,5 @@ return res.status(200).send(combinedApplications)
 
 
 app.listen(PORT,()=>{
-    console.log("connected to server http://localhost:"+PORT)
+    console.log("connected to server "+process.env.API_ROUTE+PORT)
 })
