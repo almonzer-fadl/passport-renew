@@ -54,7 +54,7 @@ export function Organizer(){
             setSignature(data.signature || null);
             setLocation(data.location || '');
             setInSudan(data.inSudan || '');
-            setStep(data.step || 0);
+            setStep(4);
         }
         setIsInitialLoad(false);
     }, []); // Empty dependency array ensures this runs only once on mount
@@ -212,7 +212,7 @@ export function Organizer(){
     </dialog>
 
             </header>
-            <ul className="steps w-full my-5">
+            <ul className="steps w-full my-5 overflow-scroll space-x-5">
   {stepList.map((title,index)=>(
      <li key={index} className={`step ${index<=step?"step-primary":""}`}>{title}</li>
   ))}

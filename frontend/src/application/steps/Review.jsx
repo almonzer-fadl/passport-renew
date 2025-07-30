@@ -13,7 +13,7 @@ export function Review(props){
 
    
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-50">
+    <div className="max-w-full mx-auto p-2 lg:max-w-4xl bg-gray-50">
       <div className="bg-white border-2 border-blue-800 rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
         <div className="bg-blue-800 text-white text-center py-3">
@@ -24,7 +24,7 @@ export function Review(props){
 
         {/* Main Content */}
         <div className="p-6 bg-gradient-to-br from-blue-50 to-green-50">
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Left Section - Personal Information */}
             <div className="col-span-2 space-y-4">

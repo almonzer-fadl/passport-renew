@@ -65,10 +65,10 @@ export const UserDashboard = () => {
 
 
   return (
-    <div className="bg-white min-h-screen lg:max-w-2/3 m-auto">
+    <div className="bg-white min-h-screen lg:max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="border-b border-gray-200 bg-white">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 gap-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-gray-600">
               <span className="font-medium">{t('applications')}</span>
@@ -79,7 +79,7 @@ export const UserDashboard = () => {
               <input
                 type="text"
                 placeholder={t('search')}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto"
               />
               <div className="absolute left-3 top-2.5">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,13 +96,13 @@ export const UserDashboard = () => {
         <div className="flex-1">
           {/* Filter Tabs */}
           <div className="border-b border-gray-200 bg-white">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex space-x-1">
+            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 gap-4">
+              <div className="flex space-x-1 overflow-x-auto sm:overflow-visible">
                 {filters.map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter)}
-                    className={`px-5 py-2 text-sm font-medium rounded-lg ${
+                    className={`px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap ${
                       activeFilter === filter
                         ? 'bg-green-100 text-blue-700'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -122,15 +122,13 @@ export const UserDashboard = () => {
           </div>
 
           {/* Table Header */}
-          <div className="bg-gray-50 border-b border-gray-200">
-            <div className="grid grid-cols-12 gap-4 px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <div className="col-span-3">{t('details')}</div>
-              <div className="col-span-2">{t('status')}</div>
-              <div className="col-span-2">{t('passportNoHeader')}</div>
-              <div className="col-span-1">{t('timeCreated')}</div>
-              <div className="col-span-2">{t('locationHeader')}</div>
-              <div className="col-span-2">{t('paymentOutstanding')}</div>
-            </div>
+          <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 border-b border-gray-200">
+            <div className="col-span-3">{t('details')}</div>
+            <div className="col-span-2">{t('status')}</div>
+            <div className="col-span-2">{t('passportNoHeader')}</div>
+            <div className="col-span-1">{t('timeCreated')}</div>
+            <div className="col-span-2">{t('locationHeader')}</div>
+            <div className="col-span-2">{t('paymentOutstanding')}</div>
           </div>
 
          
@@ -139,9 +137,9 @@ export const UserDashboard = () => {
           <div className="bg-white">
             
             {applications&&applications.map((app, index) => (
-              <div key={user.id} onClick={()=>handlePassportClick(app)} className={`grid grid-cols-12 gap-4 px-5 py-4 border-b border-t border-gray-200 hover:bg-gray-50 overflow-scroll ${index%2==1?"bg-gray-100":"bg-white"}`}>
+              <div key={user.id} onClick={()=>handlePassportClick(app)} className={`grid grid-cols-1 md:grid-cols-12 gap-4 px-5 py-4 border-b border-t border-gray-200 hover:bg-gray-50 ${index%2==1?"bg-gray-100":"bg-white"}`}>
                 {/* Details */}
-                <div className="col-span-3 flex items-center space-x-2">
+                <div className="col-span-12 md:col-span-3 flex items-center space-x-2">
                   <div className="flex-shrink-0">
                     <img
                       className="h-16 w-12 rounded-xl object-cover"
@@ -157,7 +155,7 @@ export const UserDashboard = () => {
                 </div>
 
                 {/* Status */}
-                <div className="col-span-2 flex items-center">
+                <div className="col-span-12 md:col-span-2 flex items-center">
                   <div className="flex items-center space-x-2">
                     <div className={`w-2 h-2 rounded-full ${getStatusDot(app.status)}`}></div>
                     <span className={`text-sm font-medium ${getStatusColor(app.status)}`}>
@@ -167,12 +165,12 @@ export const UserDashboard = () => {
                 </div>
 
                 {/* Passport ID */}
-                <div className="col-span-2 flex items-center">
+                <div className="col-span-12 md:col-span-2 flex items-center">
                   <span className="text-sm text-gray-900">{app.passportNo}</span>
                 </div>
 
                 {/* Time Created */}
-                <div className="col-span-1 flex items-center">
+                <div className="col-span-12 md:col-span-1 flex items-center">
                   <div>
                     {/* <p className="text-sm text-gray-900">{new Date().toLocaleDateString()}</p> */}
                     <p className="text-xs text-gray-900">{formatDate(app.dateCreated)}</p>
@@ -180,7 +178,7 @@ export const UserDashboard = () => {
                 </div>
 
                 {/* Location */}
-                <div className="col-span-2 flex items-center">
+                <div className="col-span-12 md:col-span-2 flex items-center">
                   <div>
                     <p className="text-sm text-gray-900">{app.location}</p>
                     {/* <p className="text-xs text-gray-500">{formatDate(user.dateCreated)}</p> */}
@@ -188,7 +186,7 @@ export const UserDashboard = () => {
                 </div>
 
                 {/* Payment Outstanding */}
-                <div className="col-span-1 flex items-center">
+                <div className="col-span-12 md:col-span-2 flex items-center">
                   <div>
                     <p className="text-sm text-gray-900">$0.00</p>
                     {/* <p className="text-xs text-gray-500">{formatDate(user.dateCreated)}</p> */}
@@ -217,4 +215,3 @@ export const UserDashboard = () => {
     
   );
 };
-
