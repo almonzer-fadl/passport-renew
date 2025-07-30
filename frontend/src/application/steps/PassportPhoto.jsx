@@ -9,7 +9,7 @@ import {
     checkHTTPS,
     getCameraAccessTips,
     requestCameraWithFallback
-} from '../components/image_preprocessing.js';
+} from '../../components/image_preprocessing.js';
 
 export function PassportPhoto(props) {
     const { t } = useTranslation();
