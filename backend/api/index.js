@@ -23,7 +23,8 @@ mongoose.connect(MONGODB_URI)
 const corsOptions = {
   origin: [
     process.env.FRONTEND_ROUTE,
-    'https://tajdeed-passport.vercel.app'
+    'https://tajdeed-passport.vercel.app',
+    'https://passport-renew.vercel.app'
   ],
   credentials: true, // Allow cookies and authorization headers
   optionsSuccessStatus: 200 // For legacy browser support
