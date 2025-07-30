@@ -1,27 +1,22 @@
-import { useState , useEffect } from "react";
+import { useState } from "react";
 import {Link, useNavigate} from 'react-router-dom'
 import {useAuth} from './AuthContext'
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { Loading } from "../components/Loading";
 
 export function Login(){
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false)
     const [error , setError] = useState("")
 
-    const {login, isAuthenticated} = useAuth()
+    const {login} = useAuth()
     const navigate = useNavigate()
 
 
     const [email, setEmail]= useState("")
     const [password, setPassword] = useState("")
 
-
-    useEffect(()=>{
-        if(isAuthenticated){
-            navigate('/home')
-        }
-    },[isAuthenticated, navigate])
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
@@ -38,7 +33,7 @@ export function Login(){
         try{
             const result = await login(email, password)
             if(result.success){
-                console.log(t('loginSuccessful'))
+                document.getElementById('success-modal').showModal()
             }else{
                 setError(result.message)
             }
@@ -55,10 +50,10 @@ export function Login(){
         <>
         {error? alert(error):null}
         <LanguageSwitcher />
-
-        <div className="min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-50 rounded-2xl p-10 flex-col justify-center align-middle shadow-2xl border-[0.5px]  border-blue-300 text-black">
+        {loading ? <Loading /> : (
+        <div className="w-full max-w-md mx-auto mt-10 sm:mt-20 p-6 sm:p-10 bg-blue-50 rounded-2xl shadow-2xl border-[0.5px] border-blue-300 text-black">
             <h1
-            className="text-5xl mb-5 font-bold">{t('login')}</h1>
+            className="text-3xl sm:text-5xl mb-5 font-bold text-center">{t('login')}</h1>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="email"
@@ -92,6 +87,16 @@ export function Login(){
             </form>
             <p>{t('dontHaveAccount')} <Link to="/register" className="text-blue-700">{t('register')}</Link></p>
         </div>
+        )}
+        <dialog id="success-modal" className="modal">
+            <div className="modal-box bg-green-600 text-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+                <h3 className="font-bold text-lg">{t('loginSuccessful')}</h3>
+                <p className="py-4">{t('youWillBeRedirected')}</p>
+            </div>
+            <form method="dialog" className="modal-backdrop">
+                <button onClick={() => navigate('/home')}>{t('close')}</button>
+            </form>
+        </dialog>
         </>
     )
 }

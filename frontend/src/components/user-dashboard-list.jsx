@@ -3,15 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import {useAuth} from '../auth/AuthContext'
 import PassportModal from './application-view';
 import { useTranslation } from 'react-i18next';
+import { Loading } from './Loading';
 
 export const UserDashboard = () => {
   const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState('All');
   const navigate = useNavigate()
-  // Sample data - replace with your actual data
   const {user} = useAuth()
   const applications = user.applications
-  console.log(applications)
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (applications) {
+      setLoading(false);
+    }
+  }, [applications]);
 
   const [selectedPassport, setSelectedPassport] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,6 +72,8 @@ export const UserDashboard = () => {
 
   return (
     <div className="bg-white min-h-screen lg:max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      {loading ? <Loading /> : (
+        <>
       {/* Header */}
       <div className="border-b border-gray-200 bg-white">
         <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 gap-4">
@@ -210,7 +218,8 @@ export const UserDashboard = () => {
         onClose={handleCloseModal}
         passportData={selectedPassport}
       />
-       
+       </>
+      )}
     </div>
     
   );

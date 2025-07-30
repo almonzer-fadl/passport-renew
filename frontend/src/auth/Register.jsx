@@ -1,15 +1,16 @@
-import { useState , useEffect } from "react";
+import { useState } from "react";
 import {Link, useNavigate} from 'react-router-dom'
 import {useAuth} from './AuthContext'
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { Loading } from "../components/Loading";
 
 export function Register(){
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false)
     const [error , setError] = useState("")
 
-    const {register, isAuthenticated} = useAuth()
+    const {register} = useAuth()
     const navigate = useNavigate()
 
 
@@ -18,12 +19,6 @@ export function Register(){
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
 
-
-    useEffect(()=>{
-        if(isAuthenticated){
-            navigate('/home')
-        }
-    },[isAuthenticated, navigate])
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
@@ -44,7 +39,7 @@ export function Register(){
         try{
             const result = await register(username, email, password)
             if(result.success){
-                console.log(t('registrationSuccessful'))
+                document.getElementById('success-modal').showModal()
             }else{
                 setError(result.message)
             }
@@ -61,9 +56,9 @@ export function Register(){
         <>
         {error? alert(error):null}
         <LanguageSwitcher />
-
-        <div className="min-w-120 min-h-100  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-50 rounded-2xl p-10 flex-col justify-center align-middle shadow-2xl border-[0.5px]  border-blue-300 text-black">
-            <h1 className="text-5xl mb-5 font-bold">{t('register')}</h1>
+        {loading ? <Loading /> : (
+        <div className="w-full max-w-md mx-auto mt-10 sm:mt-20 p-6 sm:p-10 bg-blue-50 rounded-2xl shadow-2xl border-[0.5px] border-blue-300 text-black">
+            <h1 className="text-3xl sm:text-5xl mb-5 font-bold text-center">{t('register')}</h1>
             <form onSubmit={handleSubmit}>
                 <div className="no-flex">
                     <label htmlFor="username">{t('username')}</label>
@@ -116,6 +111,16 @@ export function Register(){
             </form>
             <p>{t('alreadyHaveAccount')} <Link className="text-blue-700" to="/login">{t('login')}</Link></p>
         </div>
+        )}
+        <dialog id="success-modal" className="modal">
+            <div className="modal-box bg-green-600 text-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+                <h3 className="font-bold text-lg">{t('registrationSuccessful')}</h3>
+                <p className="py-4">{t('youWillBeRedirected')}</p>
+            </div>
+            <form method="dialog" className="modal-backdrop">
+                <button onClick={() => navigate('/home')}>{t('close')}</button>
+            </form>
+        </dialog>
         </>
     )
 }

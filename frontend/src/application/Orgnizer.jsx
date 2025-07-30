@@ -1,9 +1,7 @@
-import {useState, useEffect, useContext} from 'react'
+import {useState, useEffect} from 'react'
 import cancelImg from '../assets/cancel.svg'
-import {organizerContext} from '../App'
 import {BasicInformation} from './steps/BasicInformation'
 import PersonalPhoto from './steps/PersonalPhoto'
-import { Popup } from '../popup'
 import { useNavigate } from 'react-router-dom'
 import { PassportPhoto } from './steps/PassportPhoto'
 import {Signature} from './steps/Signature'
@@ -11,10 +9,12 @@ import {Location} from './steps/Location'
 import { useAuth } from '../auth/AuthContext'
 import { Review } from './steps/Review'
 import { useTranslation } from 'react-i18next'
+import { Loading } from '../components/Loading'
 
 export function Organizer(){
     const {t} = useTranslation();
     const {user} = useAuth()
+    const [loading, setLoading] = useState(false);
     //initializing variables for the whole application creation process
     const [fullnameEn, setFullnameEn] = useState("")
     const [fullnameAr, setFullnameAr] = useState("")
@@ -54,7 +54,7 @@ export function Organizer(){
             setSignature(data.signature || null);
             setLocation(data.location || '');
             setInSudan(data.inSudan || '');
-            setStep(4);
+            setStep(data.step || 0);
         }
         setIsInitialLoad(false);
     }, []); // Empty dependency array ensures this runs only once on mount
@@ -136,8 +136,7 @@ export function Organizer(){
     }
 
     const handleSubmit= async()=>{
-        console.log("starting submittion")
-
+        setLoading(true);
         try{
             const response = await fetch(import.meta.env.VITE_REACT_APP_BACKEND_ROUTE+"/api/create-app",
             {
@@ -166,12 +165,13 @@ export function Organizer(){
         )
         if (response.ok){
             localStorage.removeItem('applicationFormData');
-            return
+            document.getElementById("success-modal").showModal()
         }
 
         }catch(error){
             console.log("error", error)
-            return
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -179,76 +179,63 @@ export function Organizer(){
     
 
     return(
-       <div className='absolute w-full bg-blue-50 text-black  p-10 min-h-dvh flex flex-col justify-between align-middle'>
-       <div>
-            
+        <div className='absolute w-full bg-blue-50 text-black  p-10 min-h-dvh flex flex-col justify-between align-middle'>
+            {loading ? <Loading /> : (
+                <div>
+                    <header className="min-w-full flex flex-row justify-between bg-blue-800 p-5 rounded-2xl">
+                        <h1 className='text-4xl text-white font-bold'>{t('createNewApplication')}</h1>
+                        <button className=' w-10 h-10 justify-self-end cursor-pointer' onClick={() => {
+                            document.getElementById('exit-modal').showModal()
+                        }}>
+                            <img src={cancelImg} alt="cancel Icon" />
+                        </button>
 
-            <header className="min-w-full flex flex-row justify-between bg-blue-800 p-5 rounded-2xl">
-
-            <h1 className='text-4xl text-white font-bold'>{t('createNewApplication')}</h1>
-            <button className=' w-10 h-10 justify-self-end cursor-pointer' onClick={()=>{
-                document.getElementById('exit-modal').showModal()
-                console.log("cancel button clicked")
-            }}>
-
-                
-                <img src={cancelImg} alt="cancel Icon" />
-            </button>
-
-    <dialog id="exit-modal" className="modal">
-        <div className="modal-box bg-blue-100">
-            <h3 className="font-bold text-lg ">{t('areYouSureToExit')}</h3>
-            <p className="py-4">{t('exitWarning')}</p>
-            <div className="modal-backdrop modal-action" method="dialog">
-            <button className='btn-primary btn' onClick={()=>document.getElementById('exit-modal').close()}>{t('cancel')}</button>
-            <button className='btn-error btn text-gray-100' onClick={
-                ()=>{
-                    document.getElementById('exit-modal').close()
-                    navigate('/home')
-                }
-                }>{t('exit')}</button>
-            </div>
-        </div>
-    </dialog>
-
-            </header>
-            <ul className="steps w-full my-5 overflow-scroll space-x-5">
-  {stepList.map((title,index)=>(
-     <li key={index} className={`step ${index<=step?"step-primary":""}`}>{title}</li>
-  ))}
- 
-</ul>
-            {/* <h2 className="text-3xl my-10">Step {step+1}/{stepList.length}: <span className='bg-blue-200 text-black rounded-4xl p-2 px-4'>{stepList[step]}</span></h2> */}
-            <form onSubmit={e=>e.preventDefault()}>
-                {pages[step]}
-            </form>
-            <div className="flex w-full justify-around mt-10">
-                <button disabled={step===0} className={`btn btn-primary ${step===0?'disabled:btn-ghost':''}`} onClick={handlePrev}>{t('previous')}</button>
-                <button 
-                disabled={!stepComplete[step]}
-                className="btn btn-primary disabled:btn-ghost"
-                htmlFor={step===stepList.length-1?"success-modal":""}
-                onClick={step===stepList.length-1?()=>{handleSubmit();document.getElementById("success-modal").showModal()}:handleNext} >
-                    {step===stepList.length-1?t('finish'):t('next')}
-                    </button>
-                 <dialog id="success-modal" className="modal">
-                <div className="modal-box bg-green-600 text-white" >
-                    <h3 className="font-bold text-lg">{t('applicationSuccessful')}</h3>
-                    <p className="py-4">{t('youCanSeeItInHomePage')}</p>
+                        <dialog id="exit-modal" className="modal">
+                            <div className="modal-box bg-blue-100">
+                                <h3 className="font-bold text-lg ">{t('areYouSureToExit')}</h3>
+                                <p className="py-4">{t('exitWarning')}</p>
+                                <div className="modal-backdrop modal-action" method="dialog">
+                                    <button className='btn-primary btn' onClick={() => document.getElementById('exit-modal').close()}>{t('cancel')}</button>
+                                    <button className='btn-error btn text-gray-100' onClick={() => {
+                                        document.getElementById('exit-modal').close()
+                                        navigate('/home')
+                                    }}>{t('exit')}</button>
+                                </div>
+                            </div>
+                        </dialog>
+                    </header>
+                    <ul className="steps w-full my-5 overflow-scroll space-x-5">
+                        {stepList.map((title, index) => (
+                            <li key={index} className={`step ${index <= step ? "step-primary" : ""}`}>{title}</li>
+                        ))}
+                    </ul>
+                    <form onSubmit={e => e.preventDefault()}>
+                        {pages[step]}
+                    </form>
+                    <div className="flex w-full justify-around mt-10">
+                        <button disabled={step === 0} className={`btn btn-primary ${step === 0 ? 'disabled:btn-ghost' : ''}`} onClick={handlePrev}>{t('previous')}</button>
+                        <button
+                            disabled={!stepComplete[step]}
+                            className="btn btn-primary disabled:btn-ghost"
+                            onClick={step === stepList.length - 1 ? handleSubmit : handleNext} >
+                            {step === stepList.length - 1 ? t('finish') : t('next')}
+                        </button>
+                        <dialog id="success-modal" className="modal">
+                            <div className="modal-box bg-green-600 text-white" >
+                                <h3 className="font-bold text-lg">{t('applicationSuccessful')}</h3>
+                                <p className="py-4">{t('youCanSeeItInHomePage')}</p>
+                            </div>
+                            <form method="dialog" className="modal-backdrop">
+                                <button onClick={() => {
+                                    document.getElementById('success-modal').close()
+                                    navigate('/home')
+                                }}>{t('close')}</button>
+                            </form>
+                        </dialog>
+                    </div>
                 </div>
-                <form method="dialog" className="modal-backdrop">
-                    <button onClick={()=>{
-                        document.getElementById('success-modal').close()
-                    navigate('/home')
-                    }}>{t('close')}</button>
-                </form>
-            </dialog>
-                
-                            
-            </div>
-           
-       </div>
-       </div>
+            )}
+        </div>
     )
 
 }

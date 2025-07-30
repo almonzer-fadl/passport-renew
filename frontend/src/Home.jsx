@@ -15,15 +15,15 @@ export function Home(){
 
     return(
         <div className="bg-white min-h-dvh">
-            <header className="bg-blue-800 text-white text-4xl font-bold p-5 flex justify-between align-middle">
+            <header className="bg-blue-800 text-white font-bold p-4 flex justify-between items-center">
 
-            <h1 className="text-center">{t('passportRenewalService')}</h1>
-            <div className="flex space-x-4">
+            <h1 className="text-xl sm:text-2xl md:text-4xl text-center">{t('passportRenewalService')}</h1>
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <LanguageSwitcher />
-              <button className="w-10 h-10 flex justify-center align-middle cursor-pointer" onClick={logout}><img  src={logoutIcon} alt="logout icon"></img></button>
+              <button className="w-8 h-8 sm:w-10 sm:h-10 flex justify-center items-center cursor-pointer" onClick={logout}><img  src={logoutIcon} alt="logout icon"></img></button>
             </div>
             </header>
-            <div className=" text-gray-950 flex justify-center align-middle h-full m-10 p-10 border-2 border-gray-400 border-dashed dash rounded-2xl">
+            <div className=" text-gray-950 flex justify-center items-center h-full m-4 p-6 sm:m-10 sm:p-10 border-2 border-gray-400 border-dashed dash rounded-2xl">
                 <button className="btn btn-primary" onClick={()=>{navigate('/application')}}>{t('startNewApplication')}</button>
             </div>
             
