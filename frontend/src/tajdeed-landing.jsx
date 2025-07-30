@@ -1,8 +1,11 @@
 import React from 'react';
 import { CheckCircle, Clock, MapPin, Shield, Camera, FileText, ArrowRight, Users, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 
 export default function TajdeedLanding() {
+  const { t } = useTranslation();
   const navigate = useNavigate()
 
   const startApp = ()=>{
@@ -20,20 +23,23 @@ export default function TajdeedLanding() {
                 <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Tajdeed</h1>
-                <p className="text-sm text-gray-500">تجديد</p>
+                <h1 className="text-xl font-bold text-gray-900">{t('tajdeed')}</h1>
+                <p className="text-sm text-gray-500">{t('tajdeedAr')}</p>
               </div>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors">How It Works</a>
+              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">{t('features')}</a>
+              <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors">{t('howItWorks')}</a>
               {/* <a href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">About</a> */}
             </nav>
-            <button 
-            onClick={startApp}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-              Get Started
-            </button>
+            <div className="flex items-center space-x-4">
+              <LanguageSwitcher />
+              <button 
+              onClick={startApp}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                {t('getStarted')}
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -44,15 +50,15 @@ export default function TajdeedLanding() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-5xl font-bold text-gray-900 leading-tight mb-6">
-                Renew Your Sudanese Passport
-                <span className="block text-blue-600">Anytime, Anywhere</span>
+                {t('heroTitle1')}
+                <span className="block text-blue-600">{t('heroTitle2')}</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Skip the long lines and endless waiting. Tajdeed makes passport renewal simple, fast, and secure with advanced AI validation and an intuitive online process.
+                {t('heroSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <button onClick={startApp} className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center justify-center">
-                  Start Renewal Process
+                  {t('startRenewal')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </button>
                 {/* <button className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-colors">
@@ -104,24 +110,24 @@ export default function TajdeedLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Traditional Passport Renewal is Broken
+              {t('whyBroken')}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We understand the frustration of outdated government processes. Here's how Tajdeed solves these problems.
+              {t('whyBrokenSubtitle')}
             </p>
           </div>
           
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h3 className="text-2xl font-bold text-red-600 mb-8">The Old Way</h3>
+              <h3 className="text-2xl font-bold text-red-600 mb-8">{t('oldWay')}</h3>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <Clock className="w-4 h-4 text-red-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Hours of Waiting in Lines</h4>
-                    <p className="text-gray-600">Stand in long queues for hours, disrupting your entire day and work schedule.</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('waitingInLines')}</h4>
+                    <p className="text-gray-600">{t('waitingInLinesDesc')}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
@@ -129,8 +135,8 @@ export default function TajdeedLanding() {
                     <MapPin className="w-4 h-4 text-red-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Limited Office Hours & Locations</h4>
-                    <p className="text-gray-600">Restricted to specific times and places, making it difficult to fit into your schedule.</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('limitedHours')}</h4>
+                    <p className="text-gray-600">{t('limitedHoursDesc')}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
@@ -138,23 +144,23 @@ export default function TajdeedLanding() {
                     <FileText className="w-4 h-4 text-red-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Weeks of Processing Time</h4>
-                    <p className="text-gray-600">Extended waiting periods with uncertain timelines and limited tracking.</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('weeksOfProcessing')}</h4>
+                    <p className="text-gray-600">{t('weeksOfProcessingDesc')}</p>
                   </div>
                 </div>
               </div>
             </div>
             
             <div>
-              <h3 className="text-2xl font-bold text-green-600 mb-8">The Tajdeed Way</h3>
+              <h3 className="text-2xl font-bold text-green-600 mb-8">{t('tajdeedWay')}</h3>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Apply in Minutes, Not Hours</h4>
-                    <p className="text-gray-600">Complete your entire application online in under 10 minutes from the comfort of your home.</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('applyInMinutes')}</h4>
+                    <p className="text-gray-600">{t('applyInMinutesDesc')}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
@@ -162,8 +168,8 @@ export default function TajdeedLanding() {
                     <Clock className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">24/7 Availability</h4>
-                    <p className="text-gray-600">Apply anytime, anywhere. No more taking time off work or rushing to beat closing hours.</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('availability247')}</h4>
+                    <p className="text-gray-600">{t('availability247Desc')}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
@@ -171,8 +177,8 @@ export default function TajdeedLanding() {
                     <Shield className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">AI-Powered Validation</h4>
-                    <p className="text-gray-600">Advanced technology ensures your documents are perfect before submission, reducing delays.</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('aiValidation')}</h4>
+                    <p className="text-gray-600">{t('aiValidationDesc')}</p>
                   </div>
                 </div>
               </div>
@@ -186,10 +192,10 @@ export default function TajdeedLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Powered by Advanced Technology
+              {t('poweredByTech')}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our cutting-edge features ensure the highest security and easiest experience for your passport renewal.
+              {t('poweredByTechSubtitle')}
             </p>
           </div>
           
@@ -198,22 +204,22 @@ export default function TajdeedLanding() {
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
                 <Camera className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Photo Validation</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('aiPhotoValidation')}</h3>
               <p className="text-gray-600 mb-6">
-                Using FaceJS technology, we automatically validate that your passport photo meets all official requirements. Our AI checks for proper lighting, background, face positioning, and official standards compliance.
+                {t('aiPhotoValidationDesc')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Automatic face detection and positioning
+                  {t('autoFaceDetection')}
                 </li>
                 <li className="flex items-center text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Background and lighting validation
+                  {t('backgroundLightingValidation')}
                 </li>
                 <li className="flex items-center text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Real-time feedback and suggestions
+                  {t('realTimeFeedback')}
                 </li>
               </ul>
             </div>
@@ -222,22 +228,22 @@ export default function TajdeedLanding() {
               <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-6">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Smart Document Processing</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('smartDocProcessing')}</h3>
               <p className="text-gray-600 mb-6">
-                TesseractJS OCR technology automatically extracts and validates information from your existing passport and ID documents, ensuring 100% accuracy and preventing human error.
+                {t('smartDocProcessingDesc')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Automatic data extraction from documents
+                  {t('autoDataExtraction')}
                 </li>
                 <li className="flex items-center text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Cross-validation of personal information
+                  {t('crossValidation')}
                 </li>
                 <li className="flex items-center text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Anti-tampering detection
+                  {t('antiTampering')}
                 </li>
               </ul>
             </div>
@@ -250,10 +256,10 @@ export default function TajdeedLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Simple 3-Step Process
+              {t('simple3Step')}
             </h2>
             <p className="text-xl text-gray-600">
-              Get your passport renewed in just a few minutes with our guided process
+              {t('simple3StepSubtitle')}
             </p>
           </div>
           
@@ -262,9 +268,9 @@ export default function TajdeedLanding() {
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">1</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Fill Information</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('step1Title')}</h3>
               <p className="text-gray-600">
-                Complete the simple form with guided assistance. Our smart validation helps you avoid common mistakes.
+                {t('step1Desc')}
               </p>
             </div>
             
@@ -272,9 +278,9 @@ export default function TajdeedLanding() {
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">2</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Upload Documents</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('step2Title')}</h3>
               <p className="text-gray-600">
-                Take photos of your documents and passport photo. Our AI validates everything automatically in real-time.
+                {t('step2Desc')}
               </p>
             </div>
             
@@ -282,9 +288,9 @@ export default function TajdeedLanding() {
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">3</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Track Progress</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('step3Title')}</h3>
               <p className="text-gray-600">
-                Submit your application and track its progress in real-time through your personal dashboard.
+                {t('step3Desc')}
               </p>
             </div>
           </div>
@@ -295,19 +301,19 @@ export default function TajdeedLanding() {
       <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Renew Your Passport?
+            {t('readyToRenew')}
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of Sudanese citizens who have already experienced the easiest passport renewal process ever.
+            {t('readyToRenewSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
             onClick={startApp}
             className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
-              Start Your Application
+              {t('startYourApplication')}
             </button>
             <button className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-              View Sample Application
+              {t('viewSampleApplication')}
             </button>
           </div>
         </div>
@@ -323,12 +329,12 @@ export default function TajdeedLanding() {
                   <FileText className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold">Tajdeed</h3>
-                  <p className="text-sm text-gray-400">تجديد</p>
+                  <h3 className="font-bold">{t('tajdeed')}</h3>
+                  <p className="text-sm text-gray-400">{t('tajdeedAr')}</p>
                 </div>
               </div>
               <p className="text-gray-400 text-sm">
-                Making passport renewal simple, fast, and secure for all Sudanese citizens.
+                {t('footerDesc')}
               </p>
             </div>
             
@@ -364,7 +370,7 @@ export default function TajdeedLanding() {
           
           <div className="border-t border-gray-800 mt-12 pt-8 text-center">
             <p className="text-gray-400 text-sm">
-              © 2025 Tajdeed. All rights reserved. Made with ❤️ for Sudan.
+              {t('footerRights')}
             </p>
           </div>
         </div>

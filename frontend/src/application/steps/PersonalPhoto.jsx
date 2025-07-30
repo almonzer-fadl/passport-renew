@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as faceapi from 'face-api.js'
+import { useTranslation } from 'react-i18next';
 
 export default function PersonalPhoto(props) {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const faceCanvasRef = useRef(null)
@@ -324,20 +326,20 @@ export default function PersonalPhoto(props) {
     <div className=''>
         <div role="alert" className="alert alert-info">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>Please provide a clear photo of your face with a white background.</span>
+            <span>{t('personalPhotoInstruction')}</span>
         </div>
         
         {/* Status indicators */}
         {stream && (
           <div className="flex justify-center gap-4 mb-4 z-30 absolute top-1/10 w-full">
             <div className={`badge p-auto ${isFace ? 'badge-success' : 'badge-error'}`}>
-              {isFace ? '✓ Face Detected' : '✗ No Face'}
+              {isFace ? t('faceDetected') : t('noFace')}
             </div>
             <div className={`badge p-auto ${isFaceCentered ? 'badge-success' : 'badge-warning'}`}>
-              {isFaceCentered ? '✓ Centered' : '⚠ Move to Center'}
+              {isFaceCentered ? t('centered') : t('moveToCenter')}
             </div>
             <div className={`badge p-auto ${hasWhiteBackground ? 'badge-success' : 'badge-warning'}`}>
-              {hasWhiteBackground ? '✓ White Background' : '⚠ Need White Background'}
+              {hasWhiteBackground ? t('whiteBackground') : t('needWhiteBackground')}
             </div>
           </div>
         )}
@@ -355,7 +357,7 @@ export default function PersonalPhoto(props) {
             text="StartCamera"
 
           >
-            Start Camera
+            {t('startCamera')}
           </button>
         ) : null}
 
@@ -369,14 +371,14 @@ export default function PersonalPhoto(props) {
             className='btn'
               onClick={stopCamera}
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button 
             className='btn btn-primary'
               onClick={takePhoto}
                disabled={!isFace || !isFaceCentered}
             >
-              Take Photo
+              {t('takePhoto')}
             </button>
           </div>
         )}
@@ -390,14 +392,14 @@ export default function PersonalPhoto(props) {
                 }}
                 className="btn"
             >
-              Remove
+              {t('remove')}
             </button>
             <button 
                 onClick={retakePhoto}
                 className="btn"
                 text="Retake"
             >
-                Retake
+                {t('retake')}
             </button>
             
           </div>

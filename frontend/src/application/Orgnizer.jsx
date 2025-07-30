@@ -10,7 +10,10 @@ import {Signature} from './steps/Signature'
 import {Location} from './steps/Location'
 import { useAuth } from '../auth/AuthContext'
 import { Review } from './steps/Review'
+import { useTranslation } from 'react-i18next'
+
 export function Organizer(){
+    const {t} = useTranslation();
     const {user} = useAuth()
     //initializing variables for the whole application creation process
     const [fullnameEn, setFullnameEn] = useState("")
@@ -96,7 +99,7 @@ export function Organizer(){
   
     
     //local variables
-    const stepList = ["Basic Information","Personal Photo","Passport Photo","signature","Location", "Review"]
+    const stepList = [t('basicInformation'), t('personalPhoto'), t('passportPhoto'), t('signature'), t('location'), t('review')]
     const pages = [
         <BasicInformation payload={basicInfoPayload}/>, 
         <PersonalPhoto photo={[personalPhoto,setPersonalPhoto]}/>, 
@@ -182,7 +185,7 @@ export function Organizer(){
 
             <header className="min-w-full flex flex-row justify-between bg-blue-800 p-5 rounded-2xl">
 
-            <h1 className='text-4xl text-white font-bold'>Create New Application</h1>
+            <h1 className='text-4xl text-white font-bold'>{t('createNewApplication')}</h1>
             <button className=' w-10 h-10 justify-self-end cursor-pointer' onClick={()=>{
                 document.getElementById('exit-modal').showModal()
                 console.log("cancel button clicked")
@@ -194,16 +197,16 @@ export function Organizer(){
 
     <dialog id="exit-modal" className="modal">
         <div className="modal-box bg-blue-100">
-            <h3 className="font-bold text-lg ">Are you sure you want to exit?</h3>
-            <p className="py-4">Press ESC key or click Go Back to close</p>
+            <h3 className="font-bold text-lg ">{t('areYouSureToExit')}</h3>
+            <p className="py-4">{t('exitWarning')}</p>
             <div className="modal-backdrop modal-action" method="dialog">
-            <button className='btn-primary btn' onClick={()=>document.getElementById('exit-modal').close()}>Cancel</button>
+            <button className='btn-primary btn' onClick={()=>document.getElementById('exit-modal').close()}>{t('cancel')}</button>
             <button className='btn-error btn text-gray-100' onClick={
                 ()=>{
                     document.getElementById('exit-modal').close()
                     navigate('/home')
                 }
-                }>Exit</button>
+                }>{t('exit')}</button>
             </div>
         </div>
     </dialog>
@@ -220,24 +223,24 @@ export function Organizer(){
                 {pages[step]}
             </form>
             <div className="flex w-full justify-around mt-10">
-                <button disabled={step===0} className={`btn btn-primary ${step===0?'disabled:btn-ghost':''}`} onClick={handlePrev}>Previous</button>
+                <button disabled={step===0} className={`btn btn-primary ${step===0?'disabled:btn-ghost':''}`} onClick={handlePrev}>{t('previous')}</button>
                 <button 
                 disabled={!stepComplete[step]}
                 className="btn btn-primary disabled:btn-ghost"
                 htmlFor={step===stepList.length-1?"success-modal":""}
                 onClick={step===stepList.length-1?()=>{handleSubmit();document.getElementById("success-modal").showModal()}:handleNext} >
-                    {step===stepList.length-1?"Finish":"Next"}
+                    {step===stepList.length-1?t('finish'):t('next')}
                     </button>
                  <dialog id="success-modal" className="modal">
                 <div className="modal-box bg-green-600 text-white" >
-                    <h3 className="font-bold text-lg">Application Successful</h3>
-                    <p className="py-4">You can see it in home page</p>
+                    <h3 className="font-bold text-lg">{t('applicationSuccessful')}</h3>
+                    <p className="py-4">{t('youCanSeeItInHomePage')}</p>
                 </div>
                 <form method="dialog" className="modal-backdrop">
                     <button onClick={()=>{
                         document.getElementById('success-modal').close()
                     navigate('/home')
-                    }}>close</button>
+                    }}>{t('close')}</button>
                 </form>
             </dialog>
                 

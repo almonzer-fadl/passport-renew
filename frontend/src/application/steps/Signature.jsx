@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function Signature(props) {
+  const { t } = useTranslation();
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
@@ -168,7 +170,7 @@ export function Signature(props) {
     <div className="w-full min-h-screen/2 flex flex-col px-4">
         <div role="alert" className="alert alert-info">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>Please sign in the box below. You have {maxStrokes} strokes.</span>
+            <span>{t('signatureInstruction', { maxStrokes })}</span>
         </div>
         {error && <div role="alert" className="alert alert-error">
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -177,7 +179,7 @@ export function Signature(props) {
       {!photo && (
         <>
           <div className="text-center mb-2 text-lg font-semibold">
-            Strokes left: {strokesLeft}
+            {t('strokesLeft', { strokesLeft })}
           </div>
           <div className="flex justify-center w-full my-10">
             <canvas
@@ -199,7 +201,7 @@ export function Signature(props) {
                 className="btn btn-error text-white font-bold py-2 px-4 rounded"
                 onClick={clearCanvas}
               >
-                Clear
+                {t('clear')}
               </button>
             )}
             {!isClear && (
@@ -207,7 +209,7 @@ export function Signature(props) {
                 className="btn btn-primary text-white font-bold py-2 px-4 rounded"
                 onClick={handleConfirm}
               >
-                Confirm
+                {t('confirm')}
               </button>
             )}
           </div>
@@ -224,7 +226,7 @@ export function Signature(props) {
             className="btn-error btn text-white font-bold py-2 px-4 rounded"
             onClick={handleRetry}
           >
-            Retry
+            {t('retake')}
           </button>
         </div>
       )}

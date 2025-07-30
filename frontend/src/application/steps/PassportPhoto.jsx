@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Tesseract from 'tesseract.js'
+import { useTranslation } from 'react-i18next';
 
 export function PassportPhoto(props) {
+    const { t } = useTranslation();
     const [photo, setPhoto] = props.photo
     const [photoBlob, setPhotoBlob] = useState(null)
     const [stream, setStream] = useState(null)
@@ -199,11 +201,11 @@ export function PassportPhoto(props) {
                     setError("");
                 } else {
                     setPhoto(null)
-                    setError("SDN not found in the document. Please retake with a clear view of a Sudanese passport.");
+                    setError(t('sdnNotDetected'));
                 }
             } catch (err) {
                 console.error('Text extraction error:', err);
-                setError("Failed to extract text from image. Please try again.");
+                setError(t('failedToExtractText'));
             } finally {
                 setIsProcessingText(false);
             }
@@ -278,7 +280,7 @@ export function PassportPhoto(props) {
         <>
             <div role="alert" className="alert alert-info">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span>Please take a photo of your Sudanese passport, make sure it is clear and readable.</span>
+                <span>{t('passportPhotoInstruction')}</span>
             </div>
             
             {error && <div role="alert" className="alert alert-error">
@@ -289,14 +291,14 @@ export function PassportPhoto(props) {
             {sdnDetected && (
                 <div role="alert" className="alert alert-success">
                     <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>Sudanese passport detected! You can continue.</span>
+                    <span>{t('sdnDetected')}</span>
                 </div>
             )}
 
             {isProcessingText && (
                 <div role="alert" className="alert alert-info">
                     <span className="loading loading-spinner loading-sm"></span>
-                    <span>Processing image and checking for SDN...</span>
+                    <span>{t('processingAndChecking')}</span>
                 </div>
             )}
             
@@ -306,7 +308,7 @@ export function PassportPhoto(props) {
                         className=" btn btn-primary m-auto" 
                         onClick={startCamera}
                     >
-                        Start Camera
+                        {t('startCamera')}
                     </button>
                 </div>
             )}
@@ -342,18 +344,18 @@ export function PassportPhoto(props) {
                                 ? 'bg-green-500 text-white' 
                                 : 'bg-red-500 text-white'
                         }`}>
-                            {documentDetected ? 'Document Detected' : 'No Document'}
+                            {documentDetected ? t('documentDetected') : t('noDocument')}
                         </div>
                     </div>
 
                     <div className='flex justify-center gap-10 pt-5 absolute bottom-20'>
-                        <button onClick={stopCamera} className='btn'>Cancel</button>
+                        <button onClick={stopCamera} className='btn'>{t('cancel')}</button>
                         <button 
                             onClick={takePhoto} 
                             className={`btn ${documentDetected ? 'btn-primary' : 'btn-disabled'}`}
                             disabled={!documentDetected}
                         >
-                            {documentDetected ? 'Take Photo' : 'Position Document'}
+                            {documentDetected ? t('takePhoto') : t('positionDocument')}
                         </button>
                     </div>
                 </div>
@@ -381,8 +383,8 @@ export function PassportPhoto(props) {
                     )}
                     
                     <div className='flex justify-center gap-10 pt-5'>
-                        <button onClick={cancel} className='btn'>Remove</button>
-                        <button onClick={startCamera} className='btn'>Retake</button>
+                        <button onClick={cancel} className='btn'>{t('remove')}</button>
+                        <button onClick={startCamera} className='btn'>{t('retake')}</button>
                     </div>
                 </div>
             )}

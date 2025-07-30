@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useAuth} from '../auth/AuthContext'
 import PassportModal from './application-view';
+import { useTranslation } from 'react-i18next';
 
 export const UserDashboard = () => {
+  const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState('All');
   const navigate = useNavigate()
   // Sample data - replace with your actual data
@@ -24,7 +26,7 @@ export const UserDashboard = () => {
     setSelectedPassport(null);
   };
 
-  const filters = ['All', 'Approved', 'Pending', 'Rejected'];
+  const filters = [t('all'), t('approved'), t('pending'), t('rejected')];
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved':
@@ -69,14 +71,14 @@ export const UserDashboard = () => {
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-gray-600">
-              <span className="font-medium">Applications</span>
+              <span className="font-medium">{t('applications')}</span>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search"
+                placeholder={t('search')}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <div className="absolute left-3 top-2.5">
@@ -111,7 +113,7 @@ export const UserDashboard = () => {
                 ))}
               </div>
               <button className="flex items-center space-x-4 px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
-                <span>Filter</span>
+                <span>{t('filter')}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z" />
                 </svg>
@@ -122,12 +124,12 @@ export const UserDashboard = () => {
           {/* Table Header */}
           <div className="bg-gray-50 border-b border-gray-200">
             <div className="grid grid-cols-12 gap-4 px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <div className="col-span-3">DETAILS</div>
-              <div className="col-span-2">STATUS</div>
-              <div className="col-span-2">PASSPORT NO.</div>
-              <div className="col-span-1">TIME CREATED</div>
-              <div className="col-span-2">LOCATION</div>
-              <div className="col-span-2">PAYMENT OUTSTANDING</div>
+              <div className="col-span-3">{t('details')}</div>
+              <div className="col-span-2">{t('status')}</div>
+              <div className="col-span-2">{t('passportNoHeader')}</div>
+              <div className="col-span-1">{t('timeCreated')}</div>
+              <div className="col-span-2">{t('locationHeader')}</div>
+              <div className="col-span-2">{t('paymentOutstanding')}</div>
             </div>
           </div>
 
@@ -196,9 +198,9 @@ export const UserDashboard = () => {
             ))}
              {applications&&applications.length===0 ?(
             <div className='w-full h-full flex flex-col gap-5 justify-center items-center text-gray-600 my-10'>
-              <h2 className='text-3xl'>You don't have any applications to see</h2>
-              <p>Press the button to start a new application</p>
-                              <button className="btn btn-primary" onClick={()=>{navigate('/application')}}>Start New Application</button>
+              <h2 className='text-3xl'>{t('noApplications')}</h2>
+              <p>{t('pressButtonToStart')}</p>
+                              <button className="btn btn-primary" onClick={()=>{navigate('/application')}}>{t('startNewApplication')}</button>
 
             </div>
           ):<></>}

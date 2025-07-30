@@ -7,15 +7,19 @@ import { ProtectedRoute } from './auth/ProtectedRoute'
 import { Organizer } from './application/Orgnizer'
 import {createContext, useEffect, useRef, useState} from 'react'
 import TajdeedLanding from './tajdeed-landing'
+import { useTranslation } from 'react-i18next'
 export const organizerContext = createContext()
 export default function App() {
   const [isOrganizerRunning, setIsOrganizerRunning] = useState(false)
+  const { i18n } = useTranslation();
   // useEffect(()=>{
   //   localStorage.setItem('organizer',isOrganizerRunning)
   //   console.log("organizer stored ", {isOrganizerRunning});
     
   // },[isOrganizerRunning])
-  
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+  }, [i18n, i18n.language]);
 
   return (
     <Router>

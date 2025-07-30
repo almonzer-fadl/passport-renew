@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import { allCountriesList } from "./Countries"
+import { useTranslation } from "react-i18next";
+
 // My main 
 export function BasicInformation(props){
-
+    const { t } = useTranslation();
     const {fullnameEn, setFullnameEn} = props.payload
     const {fullnameAr,setFullnameAr} = props.payload
     const {passportNo, setPassportNo} = props.payload
@@ -44,7 +46,7 @@ export function BasicInformation(props){
   };
 
   //I know this is questionable but it was an AI method for creating radio button and it uses lists of object
-  const genders = [{value:'male', label:'Male'}, {value:'female', label:'Female'}]
+  const genders = [{value:'male', label:t('male')}, {value:'female', label:t('female')}]
    const RadioGroup = ({ name, options, selected, onChange, className = '' }) => (
     <div className={`space-y-2 ${className}`}>
       {options.map((option) => (
@@ -81,10 +83,10 @@ export function BasicInformation(props){
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="h-6 w-6 shrink-0 stroke-current">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <ul className="list-disc ">Enter information of the old passport as following format:
-                <li>Names must be as same as written in passport.</li>
-                <li>Passport No. must be formatted as "AA000000" </li>
-                <li>National No. must be formatted as "000-0000-0000" </li>
+            <ul className="list-disc ">{t('infoInstruction')}
+                <li>{t('namesAsInPassport')}</li>
+                <li>{t('passportNoFormat')}</li>
+                <li>{t('nationalNoFormat')}</li>
             </ul>
         </div>
 
@@ -96,7 +98,7 @@ export function BasicInformation(props){
         </div>}
 
         <div className="col-span-1 lg:col-span-2 ">
-        <label htmlFor="fullname-en">Fullname(English)*</label>
+        <label htmlFor="fullname-en">{t('fullnameEn')}</label>
         <input type="text"
         name="fullname-en"
         className="input input-lg w-full"
@@ -107,15 +109,15 @@ export function BasicInformation(props){
             onChange={(e)=>{
                 const name = e.target.value
                 if(numbers.includes(name[name.length-1])){
-                    setError(`You cannot use numbers in names`)
+                    setError(t('noNumbersInNames'))
                     return 
                 }
                 if(symbols.includes(name[name.length-1])){
-                    setError('You cannot use symbols in names')
+                    setError(t('noSymbolsInNames'))
                     return
                 }
                 if(arChar.includes(name[name.length-1])){
-                    setError('You cannot use Arabic letters in English names')
+                    setError(t('noArabicInEnglish'))
                     return 
                 }
                 if(engChar.includes(name[name.length-1])){
@@ -129,7 +131,7 @@ export function BasicInformation(props){
 
        </div>
        <div className="col-span-1 lg:col-span-2 ">
-        <label htmlFor="fullname-ar">Fullname(Arabic)*</label>
+        <label htmlFor="fullname-ar">{t('fullnameAr')}</label>
         <input type="text"
         name="fullname-ar"
         className="input input-lg w-full"
@@ -141,15 +143,15 @@ export function BasicInformation(props){
             onChange={(e)=>{
                  const name = e.target.value
                 if(numbers.includes(name[name.length-1])){
-                    setError(`You cannot use numbers in names`)
+                    setError(t('noNumbersInNames'))
                     return 
                 }
                 if(symbols.includes(name[name.length-1])){
-                    setError('You cannot use symbols in names')
+                    setError(t('noSymbolsInNames'))
                     return
                 }
                 if(engChar.includes(name[name.length-1])){
-                    setError('You cannot use English letters in Arabic names')
+                    setError(t('noEnglishInArabic'))
                     return
                      
                 }
@@ -168,7 +170,7 @@ export function BasicInformation(props){
 
          
        <div className="col-span-1 lg:col-span-2 ">
-        <label htmlFor="passport-number">Passport No.*</label>
+        <label htmlFor="passport-number">{t('passportNo')}</label>
         <input type="text"
         className="input input-lg w-full"
         name="passport-number"
@@ -180,21 +182,21 @@ export function BasicInformation(props){
             onChange={(e)=>{
                  const number = e.target.value
                 if(symbols.includes(number[number.length-1])){
-                    setError('You cannot use symbols in names')
+                    setError(t('noSymbols'))
                     return
                 }
                 if(arChar.includes(number[number.length-1])){
-                    setError('You cannot use Arabic letters')
+                    setError(t('noArabic'))
                     return 
                 }
 
 
                 if(number.length>2 && engChar.includes(number[number.length-1])){
-                    setError('The passport number cannot contain letters after 2 digits')
+                    setError(t('noLettersAfter2Digits'))
                     return
                 }
                 else if(number.length<2 &&numbers.includes(number[number.length-1])){
-                    return setError("Cannot start with a number")
+                    return setError(t('cannotStartWithNumber'))
                 }else{
                     setError("")
                 }
@@ -206,7 +208,7 @@ export function BasicInformation(props){
        </div>
 
         <div className="col-span-1 lg:col-span-2 ">
-        <label htmlFor="national-number">National No.*</label>
+        <label htmlFor="national-number">{t('nationalNo')}</label>
         <input type="text"
         className="input input-lg w-full"
         name="national-number"
@@ -219,15 +221,15 @@ export function BasicInformation(props){
 
                   const number = e.target.value
                 if(symbols.includes(number[number.length-1])){
-                    setError('You cannot use symbols in names')
+                    setError(t('noSymbols'))
                     return
                 }
                 if(arChar.includes(number[number.length-1])){
-                    setError('You cannot use Arabic letters')
+                    setError(t('noArabic'))
                     return 
                 } 
                 if(engChar.includes(number[number.length-1])){
-                    setError('You cannot use English letters')
+                    setError(t('noEnglish'))
                     return 
                 } 
                 if(numbers.includes(number[number.length-1])){
@@ -243,7 +245,7 @@ export function BasicInformation(props){
        
 
          <div className="flex flex-col col-span-1 lg:col-span-3 ">
-        <label htmlFor="birth-place">Birth Place*</label>
+        <label htmlFor="birth-place">{t('birthPlace')}</label>
         <select type="text"
         className="select select-lg w-full"
         name="birth-place"
@@ -252,7 +254,7 @@ export function BasicInformation(props){
             placeholder="place of birth"
             onChange={(e)=>{setBirthPlace(e.target.value)}}
         >
-            <option value="" disabled >Choose Birth Place</option>
+            <option value="" disabled >{t('chooseBirthPlace')}</option>
             {allCountriesList.map((country,index)=>(
                 <option 
                 key={index}
@@ -266,7 +268,7 @@ export function BasicInformation(props){
 
 
        <div className="flex flex-col col-span-1 lg:col-span-1 ">
-        <label htmlFor="birthday">Birthday*</label>
+        <label htmlFor="birthday">{t('birthday')}</label>
         <input type="date"
         className="input input-lg w-full"
         name="birthday"
@@ -280,7 +282,7 @@ export function BasicInformation(props){
        
          
          <div className="flex flex-col col-span-1 lg:col-span-2 ">
-        <label htmlFor="issuance">Issuance Date*</label>
+        <label htmlFor="issuance">{t('issuanceDate')}</label>
         <input type="date"
         className="input input-lg w-full"
         name="issuance"
@@ -292,7 +294,7 @@ export function BasicInformation(props){
        </div>
          
          <div className="flex flex-col col-span-1 lg:col-span-2 ">
-        <label htmlFor="expiry" >Expiry Date *</label>
+        <label htmlFor="expiry" >{t('expiryDate')}</label>
         <input type="date"
         className="input input-lg w-full"
         name="expiry"
@@ -305,7 +307,7 @@ export function BasicInformation(props){
         
 
       <div className="col-span-1 lg:col-span-2 ">
-        <label htmlFor="gender">Gender*</label>
+        <label htmlFor="gender">{t('gender')}</label>
         <RadioGroup
         name="gender"
         options={genders}
