@@ -172,5 +172,6 @@
   "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
   "somethingWentWrong": "حدث خطأ ما ، يرجى المحاولة مرة أخرى",
   "loginSuccessful": "تم تسجيل الدخول بنجاح",
-  "registrationSuccessful": "تم التسجيل بنجاح"
+  "registrationSuccessful": "تم التسجيل بنجاح",
+  "youWillBeRedirected": "سيتم توجيهك قريبًا"
 }

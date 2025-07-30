@@ -172,5 +172,6 @@
   "passwordsDoNotMatch": "Passwords do not match",
   "somethingWentWrong": "Something went wrong, please try again",
   "loginSuccessful": "Login successful",
-  "registrationSuccessful": "Registration successful"
+  "registrationSuccessful": "Registration successful",
+  "youWillBeRedirected": "You will be redirected shortly"
 }
